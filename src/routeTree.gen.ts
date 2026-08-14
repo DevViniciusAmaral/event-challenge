@@ -10,33 +10,113 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GateRouteImport } from './routes/gate'
+import { Route as OrganizerRouteImport } from './routes/organizer'
+import { Route as EventsIdRouteImport } from './routes/events.$id'
+import { Route as TicketsIdRouteImport } from './routes/tickets.$id'
+import { Route as EventsIdCheckoutRouteImport } from './routes/events.$id.checkout'
+import { Route as OrganizerEventsNewRouteImport } from './routes/organizer.events.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GateRoute = GateRouteImport.update({
+  id: '/gate',
+  path: '/gate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizerRoute = OrganizerRouteImport.update({
+  id: '/organizer',
+  path: '/organizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIdRoute = EventsIdRouteImport.update({
+  id: '/events/$id',
+  path: '/events/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TicketsIdRoute = TicketsIdRouteImport.update({
+  id: '/tickets/$id',
+  path: '/tickets/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIdCheckoutRoute = EventsIdCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => EventsIdRoute,
+} as any)
+const OrganizerEventsNewRoute = OrganizerEventsNewRouteImport.update({
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => OrganizerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gate': typeof GateRoute
+  '/organizer': typeof OrganizerRouteWithChildren
+  '/events/$id': typeof EventsIdRouteWithChildren
+  '/tickets/$id': typeof TicketsIdRoute
+  '/events/$id/checkout': typeof EventsIdCheckoutRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gate': typeof GateRoute
+  '/organizer': typeof OrganizerRouteWithChildren
+  '/events/$id': typeof EventsIdRouteWithChildren
+  '/tickets/$id': typeof TicketsIdRoute
+  '/events/$id/checkout': typeof EventsIdCheckoutRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gate': typeof GateRoute
+  '/organizer': typeof OrganizerRouteWithChildren
+  '/events/$id': typeof EventsIdRouteWithChildren
+  '/tickets/$id': typeof TicketsIdRoute
+  '/events/$id/checkout': typeof EventsIdCheckoutRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/gate'
+    | '/organizer'
+    | '/events/$id'
+    | '/tickets/$id'
+    | '/events/$id/checkout'
+    | '/organizer/events/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/gate'
+    | '/organizer'
+    | '/events/$id'
+    | '/tickets/$id'
+    | '/events/$id/checkout'
+    | '/organizer/events/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/gate'
+    | '/organizer'
+    | '/events/$id'
+    | '/tickets/$id'
+    | '/events/$id/checkout'
+    | '/organizer/events/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GateRoute: typeof GateRoute
+  OrganizerRoute: typeof OrganizerRouteWithChildren
+  EventsIdRoute: typeof EventsIdRouteWithChildren
+  TicketsIdRoute: typeof TicketsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +128,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gate': {
+      id: '/gate'
+      path: '/gate'
+      fullPath: '/gate'
+      preLoaderRoute: typeof GateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizer': {
+      id: '/organizer'
+      path: '/organizer'
+      fullPath: '/organizer'
+      preLoaderRoute: typeof OrganizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$id': {
+      id: '/events/$id'
+      path: '/events/$id'
+      fullPath: '/events/$id'
+      preLoaderRoute: typeof EventsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tickets/$id': {
+      id: '/tickets/$id'
+      path: '/tickets/$id'
+      fullPath: '/tickets/$id'
+      preLoaderRoute: typeof TicketsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$id/checkout': {
+      id: '/events/$id/checkout'
+      path: '/checkout'
+      fullPath: '/events/$id/checkout'
+      preLoaderRoute: typeof EventsIdCheckoutRouteImport
+      parentRoute: typeof EventsIdRoute
+    }
+    '/organizer/events/new': {
+      id: '/organizer/events/new'
+      path: '/events/new'
+      fullPath: '/organizer/events/new'
+      preLoaderRoute: typeof OrganizerEventsNewRouteImport
+      parentRoute: typeof OrganizerRoute
+    }
   }
 }
 
+interface OrganizerRouteChildren {
+  OrganizerEventsNewRoute: typeof OrganizerEventsNewRoute
+}
+
+const OrganizerRouteChildren: OrganizerRouteChildren = {
+  OrganizerEventsNewRoute: OrganizerEventsNewRoute,
+}
+
+const OrganizerRouteWithChildren = OrganizerRoute._addFileChildren(
+  OrganizerRouteChildren,
+)
+
+interface EventsIdRouteChildren {
+  EventsIdCheckoutRoute: typeof EventsIdCheckoutRoute
+}
+
+const EventsIdRouteChildren: EventsIdRouteChildren = {
+  EventsIdCheckoutRoute: EventsIdCheckoutRoute,
+}
+
+const EventsIdRouteWithChildren = EventsIdRoute._addFileChildren(
+  EventsIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GateRoute: GateRoute,
+  OrganizerRoute: OrganizerRouteWithChildren,
+  EventsIdRoute: EventsIdRouteWithChildren,
+  TicketsIdRoute: TicketsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
