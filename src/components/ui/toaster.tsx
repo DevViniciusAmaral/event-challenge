@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { toast as realToast } from '@/hooks/use-toast'
+import { toast as realToast, useToast  } from '@/hooks/use-toast'
 import {
   Toast,
   ToastAction,
@@ -7,16 +7,11 @@ import {
   ToastDescription,
   ToastProvider,
   ToastTitle,
-  ToastViewport,
-  type ToastProps,
+  ToastViewport
+  
 } from '@/components/ui/toast'
-import { useToast } from '@/hooks/use-toast'
-import {
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  XCircle,
-} from 'lucide-react'
+import type {ToastProps} from '@/components/ui/toast';
+import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const variantIcon = {
@@ -37,17 +32,19 @@ const variantIconClass = {
 
 export function extractBackendMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
-    const d = err.response?.data?.error as any
+    const d = err.response?.data?.error
     if (typeof d?.message === 'string' && d.message.trim()) return d.message
     if (typeof d?.error === 'string' && d.error.trim()) return d.error
     if (Array.isArray(d?.errors) && d.errors.length > 0) {
       const first = d.errors[0]
       if (typeof first === 'string') return first
-      if (typeof first?.message === 'string' && first.message.trim()) return first.message
+      if (typeof first?.message === 'string' && first.message.trim())
+        return first.message
     }
     if (typeof d?.detail === 'string' && d.detail.trim()) return d.detail
   }
-  if (err instanceof Error && err.message && err.message.trim()) return err.message
+  if (err instanceof Error && err.message && err.message.trim())
+    return err.message
   return 'Ocorreu um erro ao processar sua solicitação.'
 }
 
@@ -69,7 +66,7 @@ export function Toaster() {
           <Toast
             key={id}
             variant={variant ?? 'default'}
-            {...(props as ToastProps)}
+            {...(props)}
           >
             <div className="flex gap-3">
               <Icon
@@ -86,10 +83,7 @@ export function Toaster() {
               </div>
             </div>
             {action?.label ? (
-              <ToastAction
-                altText={action.altText}
-                onClick={action.onClick}
-              >
+              <ToastAction altText={action.altText} onClick={action.onClick}>
                 {action.label}
               </ToastAction>
             ) : null}

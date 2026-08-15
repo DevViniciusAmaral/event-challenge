@@ -8,18 +8,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useCreateEvent, usePublishEvent } from '@/presentation/hooks/useEvents'
 import { successToast } from '@/components/ui/toaster'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  createEventSchema,
-  type CreateEventSchema,
+  createEventSchema
+  
 } from '#/domain/schemas/event.schema'
+import type {CreateEventSchema} from '#/domain/schemas/event.schema';
+import { Label } from './ui/label'
+import { Input } from './ui/input'
+import { Textarea } from './ui/textarea'
 
 interface CreateEventModalProps {
   open: boolean
@@ -42,7 +43,10 @@ const DEFAULT_VALUES: CreateEventSchema = {
   publishAfter: true,
 }
 
-export function CreateEventModal({ open, onOpenChange }: CreateEventModalProps) {
+export function CreateEventModal({
+  open,
+  onOpenChange,
+}: CreateEventModalProps) {
   const createMutation = useCreateEvent()
   const publishMutation = usePublishEvent()
 
@@ -53,7 +57,7 @@ export function CreateEventModal({ open, onOpenChange }: CreateEventModalProps) 
     watch,
     formState: { errors, isSubmitting: formSubmitting },
   } = useForm<CreateEventSchema>({
-    resolver: zodResolver(createEventSchema),
+    resolver: zodResolver(createEventSchema) as any,
     defaultValues: DEFAULT_VALUES,
     mode: 'onTouched',
   })
@@ -71,11 +75,7 @@ export function CreateEventModal({ open, onOpenChange }: CreateEventModalProps) 
     formSubmitting || createMutation.isPending || publishMutation.isPending
 
   const onSubmit = (values: CreateEventSchema) => {
-    const {
-      publishAfter: shouldPublish,
-      imageUrl,
-      ...payloadBody
-    } = values
+    const { publishAfter: shouldPublish, imageUrl, ...payloadBody } = values
 
     const payload = {
       ...payloadBody,
@@ -105,9 +105,10 @@ export function CreateEventModal({ open, onOpenChange }: CreateEventModalProps) 
     })
   }
 
-  const inputErrorClass = (
-    hasError: boolean,
-  ): string => (hasError ? 'border-destructive focus:border-destructive focus:ring-destructive' : '')
+  const inputErrorClass = (hasError: boolean): string =>
+    hasError
+      ? 'border-destructive focus:border-destructive focus:ring-destructive'
+      : ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -347,8 +348,15 @@ export function CreateEventModal({ open, onOpenChange }: CreateEventModalProps) 
               checked={publishAfter}
               onCheckedChange={(v) =>
                 reset(
-                  { ...(watch() as CreateEventSchema), publishAfter: Boolean(v) },
-                  { keepValues: true, keepErrors: true, keepIsSubmitted: false },
+                  {
+                    ...(watch()),
+                    publishAfter: Boolean(v),
+                  },
+                  {
+                    keepValues: true,
+                    keepErrors: true,
+                    keepIsSubmitted: false,
+                  },
                 )
               }
             />

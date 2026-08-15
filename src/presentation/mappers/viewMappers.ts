@@ -1,8 +1,4 @@
-import type { EventItem } from '#/utils/mocks'
-import type {
-  EventSummary,
-  EventDetail,
-} from '#/domain/types/event.types'
+import type { EventSummary, EventDetail } from '#/domain/types/event.types'
 import type { OrganizerEventSummary } from '#/domain/types/organizer.types'
 
 const DEFAULT_IMAGE =
@@ -11,7 +7,7 @@ const DEFAULT_IMAGE =
 export function mapEventSummaryToEventItem(
   summary: EventSummary,
   detail?: EventDetail,
-): EventItem {
+) {
   const availableTickets =
     Number((summary as EventSummary & { availables?: number }).availables) ||
     Number(summary.availableTickets) ||
@@ -34,13 +30,13 @@ export function mapEventSummaryToEventItem(
   }
 }
 
-export function mapEventDetailToEventItem(detail: EventDetail): EventItem {
+export function mapEventDetailToEventItem(detail: EventDetail) {
   return mapEventSummaryToEventItem(detail, detail)
 }
 
 export function mapOrganizerEventToEventItem(
   orgEvent: OrganizerEventSummary,
-): EventItem {
+) {
   const capacity = Number(orgEvent.capacity) || 0
   const ticketPrice = Number(orgEvent.ticketPrice) || 0
 
@@ -75,13 +71,16 @@ export function mapOrganizerEventToEventItem(
 }
 
 export function mapStats(
-  stats: {
-    totalEvents: number
-    publishedEvents: number
-    totalTicketsSold: number
-    totalRevenue: number
-    upcomingEvents: number
-  } | null | undefined,
+  stats:
+    | {
+        totalEvents: number
+        publishedEvents: number
+        totalTicketsSold: number
+        totalRevenue: number
+        upcomingEvents: number
+      }
+    | null
+    | undefined,
 ) {
   return {
     totalEvents: Number(stats?.totalEvents) || 0,

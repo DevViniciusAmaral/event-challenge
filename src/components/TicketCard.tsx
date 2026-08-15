@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import type { TicketDetail } from '../domain/types/ticket.types'
+import { formatDateTime } from '@/lib/utils'
 
 interface TicketCardProps {
   ticket: TicketDetail
@@ -67,10 +68,7 @@ export function TicketCard({ ticket, showShareLink = false }: TicketCardProps) {
             <div>
               <p className="font-medium text-zinc-400">Data e Hora</p>
               <p className="mt-1 text-zinc-900 font-medium">
-                {event.date
-                  ? new Date(event.date).toLocaleDateString('pt-BR')
-                  : ''}{' '}
-                às {event.time}
+                {formatDateTime(event.date, event.time)}
               </p>
             </div>
             <div>

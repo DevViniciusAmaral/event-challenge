@@ -75,11 +75,7 @@ function toast(props: ToastInput) {
 function dismiss(id?: string) {
   dispatch({
     toasts: memoryState.toasts
-      .map((t) =>
-        id === undefined || t.id === id
-          ? { ...t, open: false }
-          : t,
-      )
+      .map((t) => (id === undefined || t.id === id ? { ...t, open: false } : t))
       .filter((t) => t.open !== false),
   })
 }
