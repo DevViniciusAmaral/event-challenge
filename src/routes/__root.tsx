@@ -40,12 +40,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="bg-zinc-50 text-zinc-900 antialiased">
         <QueryProvider>
           <Header />
-          <main className="min-h-[calc(100vh-4rem-116px)]">
-            {children}
-          </main>
+          <main className="min-h-[calc(100vh-4rem-116px)]">{children}</main>
           <footer className="border-t border-zinc-200 bg-white py-8 text-center text-xs text-zinc-400">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <p>&copy; {new Date().getFullYear()} Velas Ingressos. Todos os direitos reservados. Desafio Técnico.</p>
+              <p>
+                &copy; {new Date().getFullYear()} Velas Ingressos. Todos os
+                direitos reservados. Desafio Técnico.
+              </p>
             </div>
           </footer>
           <TanStackDevtools
