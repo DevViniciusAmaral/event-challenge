@@ -1,11 +1,7 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { PageContainer } from '../components/PageContainer'
+import { useNavigate } from '@tanstack/react-router'
+import { PageContainer } from './PageContainer'
 
-export const Route = createFileRoute('/$')({
-  component: NotFoundPage,
-})
-
-function NotFoundPage() {
+export function NotFoundPage() {
   const navigate = useNavigate()
 
   return (
