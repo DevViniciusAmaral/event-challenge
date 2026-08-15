@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SplatRouteImport } from './routes/$'
 import { Route as GateRouteImport } from './routes/gate'
 import { Route as OrganizerRouteImport } from './routes/organizer'
 import { Route as EventsIdRouteImport } from './routes/events.$id'
@@ -18,6 +19,11 @@ import { Route as TicketsIdRouteImport } from './routes/tickets.$id'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SplatRoute = SplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GateRoute = GateRouteImport.update({
@@ -43,6 +49,7 @@ const TicketsIdRoute = TicketsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/gate': typeof GateRoute
   '/organizer': typeof OrganizerRoute
   '/events/$id': typeof EventsIdRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/gate': typeof GateRoute
   '/organizer': typeof OrganizerRoute
   '/events/$id': typeof EventsIdRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$': typeof SplatRoute
   '/gate': typeof GateRoute
   '/organizer': typeof OrganizerRoute
   '/events/$id': typeof EventsIdRoute
@@ -65,14 +74,23 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gate' | '/organizer' | '/events/$id' | '/tickets/$id'
+  fullPaths:
+    '/' | '/$' | '/gate' | '/organizer' | '/events/$id' | '/tickets/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gate' | '/organizer' | '/events/$id' | '/tickets/$id'
-  id: '__root__' | '/' | '/gate' | '/organizer' | '/events/$id' | '/tickets/$id'
+  to: '/' | '/$' | '/gate' | '/organizer' | '/events/$id' | '/tickets/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/$'
+    | '/gate'
+    | '/organizer'
+    | '/events/$id'
+    | '/tickets/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SplatRoute: typeof SplatRoute
   GateRoute: typeof GateRoute
   OrganizerRoute: typeof OrganizerRoute
   EventsIdRoute: typeof EventsIdRoute
@@ -86,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gate': {
@@ -121,6 +146,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SplatRoute: SplatRoute,
   GateRoute: GateRoute,
   OrganizerRoute: OrganizerRoute,
   EventsIdRoute: EventsIdRoute,
