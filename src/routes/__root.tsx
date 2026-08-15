@@ -6,7 +6,25 @@ import { NotFoundPage } from '../components/not-found'
 
 import appCss from '../styles.css?url'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 0,
+      gcTime: 1000 * 60 * 5,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      retry: (failureCount, error: any) => {
+        const status = error?.response?.status
+        if (status && status >= 400 && status < 500) return false
+        return failureCount < 2
+      },
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+})
 
 export const Route = createRootRoute({
   head: () => ({
