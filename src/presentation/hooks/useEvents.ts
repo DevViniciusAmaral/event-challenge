@@ -12,9 +12,10 @@ import type {
 } from '../../domain/types/event.types'
 import { successToast, errorToast } from '../../components/ui/toaster'
 
-const EVENT_LIST_KEYS = ['list-events'] as const
-const EVENT_DETAIL_KEYS = ['event-detail'] as const
-const ORGANIZER_KEYS = ['organizer-events', 'organizer-stats'] as const
+const EVENT_LIST_PREFIX = ['list-events'] as const
+const EVENT_DETAIL_PREFIX = ['event-detail'] as const
+const ORGANIZER_EVENTS_PREFIX = ['organizer-events'] as const
+const ORGANIZER_STATS_PREFIX = ['organizer-stats'] as const
 
 export const usePublishedEvents = (search?: string) =>
   useSuspenseQuery({
@@ -35,7 +36,7 @@ export const useEventById = (id: string) =>
   })
 
 type CreateEventOptions = Omit<
-  UseMutationOptions<EventSummary, Error, CreateEventRequest>,
+  UseMutationOptions<EventSummary, Error, CreateEventRequest, unknown>,
   'mutationFn'
 >
 
@@ -43,28 +44,27 @@ export const useCreateEvent = (options?: CreateEventOptions) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    ...options,
+    ...(options as any),
     mutationFn: async (payload: CreateEventRequest) => {
       const { data } = await eventRepository.create(payload)
       return data
     },
-    onSuccess: (data, variables, ctx) => {
-      queryClient.invalidateQueries({ queryKey: EVENT_LIST_KEYS, refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: ORGANIZER_KEYS, refetchType: 'all' })
+    onSuccess: (...args: any[]) => {
+      queryClient.invalidateQueries({ queryKey: EVENT_LIST_PREFIX, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ORGANIZER_EVENTS_PREFIX, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ORGANIZER_STATS_PREFIX, refetchType: 'all' })
       successToast('Evento criado com sucesso')
-      options?.onSuccess?.(data, variables, ctx)
-
+      ;(options as any)?.onSuccess?.(...args)
     },
-    onError: (err, variables, ctx) => {
+    onError: (...args: any[]) => {
       errorToast('Erro ao criar evento')
-      options?.onError?.(err, variables, ctx)
+      ;(options as any)?.onError?.(...args)
     },
-    ...options
   })
 }
 
 type PublishEventOptions = Omit<
-  UseMutationOptions<EventSummary, Error, string>,
+  UseMutationOptions<EventSummary, Error, string, unknown>,
   'mutationFn'
 >
 
@@ -72,28 +72,29 @@ export const usePublishEvent = (options?: PublishEventOptions) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    ...options,
+    ...(options as any),
     mutationFn: async (eventId: string) => {
       const { data } = await eventRepository.publish(eventId)
       return data
     },
-    onSuccess: (data, eventId, ctx) => {
-      queryClient.invalidateQueries({ queryKey: EVENT_LIST_KEYS, refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: [...EVENT_DETAIL_KEYS, eventId], refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: ORGANIZER_KEYS, refetchType: 'all' })
+    onSuccess: (...args: any[]) => {
+      const eventId = (args as any)[1] as string
+      queryClient.invalidateQueries({ queryKey: EVENT_LIST_PREFIX, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: [...EVENT_DETAIL_PREFIX, eventId], refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ORGANIZER_EVENTS_PREFIX, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ORGANIZER_STATS_PREFIX, refetchType: 'all' })
       successToast('Evento publicado')
-      options?.onSuccess?.(data, eventId, ctx)
+      ;(options as any)?.onSuccess?.(...args)
     },
-    onError: (err, variables, ctx) => {
+    onError: (...args: any[]) => {
       errorToast('Erro ao publicar evento')
-      options?.onError?.(err, variables, ctx)
+      ;(options as any)?.onError?.(...args)
     },
-    ...options
   })
 }
 
 type DeleteEventOptions = Omit<
-  UseMutationOptions<unknown, Error, string>,
+  UseMutationOptions<unknown, Error, string, unknown>,
   'mutationFn'
 >
 
@@ -101,18 +102,20 @@ export const useDeleteEvent = (options?: DeleteEventOptions) => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    ...options,
+    ...(options as any),
     mutationFn: (eventId: string) => eventRepository.delete(eventId),
-    onSuccess: (data, eventId, ctx) => {
-      queryClient.invalidateQueries({ queryKey: EVENT_LIST_KEYS, refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: [...EVENT_DETAIL_KEYS, eventId], refetchType: 'all' })
-      queryClient.invalidateQueries({ queryKey: ORGANIZER_KEYS, refetchType: 'all' })
+    onSuccess: (...args: any[]) => {
+      const eventId = (args as any)[1] as string
+      queryClient.invalidateQueries({ queryKey: EVENT_LIST_PREFIX, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: [...EVENT_DETAIL_PREFIX, eventId], refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ORGANIZER_EVENTS_PREFIX, refetchType: 'all' })
+      queryClient.invalidateQueries({ queryKey: ORGANIZER_STATS_PREFIX, refetchType: 'all' })
       successToast('Evento excluído', 'O evento foi removido permanentemente.')
-      options?.onSuccess?.(data, eventId, ctx)
+      ;(options as any)?.onSuccess?.(...args)
     },
-    onError: (err, variables, ctx) => {
+    onError: (...args: any[]) => {
       errorToast('Erro ao excluir evento')
-      options?.onError?.(err, variables, ctx)
+      ;(options as any)?.onError?.(...args)
     },
   })
 }
