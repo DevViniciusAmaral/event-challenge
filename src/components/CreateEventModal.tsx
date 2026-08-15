@@ -15,9 +15,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createEventSchema
-  
 } from '#/domain/schemas/event.schema'
-import type {CreateEventSchema} from '#/domain/schemas/event.schema';
+import type { CreateEventSchema } from '#/domain/schemas/event.schema'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
@@ -26,9 +25,6 @@ interface CreateEventModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-
-const DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1200&auto=format&fit=crop&q=80'
 
 const DEFAULT_VALUES: CreateEventSchema = {
   title: '',
@@ -75,12 +71,7 @@ export function CreateEventModal({
     formSubmitting || createMutation.isPending || publishMutation.isPending
 
   const onSubmit = (values: CreateEventSchema) => {
-    const { publishAfter: shouldPublish, imageUrl, ...payloadBody } = values
-
-    const payload = {
-      ...payloadBody,
-      imageUrl: imageUrl || DEFAULT_IMAGE,
-    }
+    const { publishAfter: shouldPublish, ...payload } = values
 
     createMutation.mutate(payload, {
       onSuccess: (data) => {

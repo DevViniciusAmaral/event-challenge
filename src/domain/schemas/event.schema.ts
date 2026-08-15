@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { DEFAULT_IMAGE } from '#/presentation/mappers/viewMappers'
 
 export const createEventSchema = z
   .object({
@@ -39,7 +40,7 @@ export const createEventSchema = z
         message: 'Preço é obrigatório',
       })
       .min(0, 'Preço não pode ser negativo'),
-    imageUrl: z.url('URL da imagem é inválida').optional(),
+    imageUrl: z.url('URL da imagem é inválida').optional().default(DEFAULT_IMAGE),
     publishAfter: z.boolean().default(true),
   })
   .superRefine((val, ctx) => {

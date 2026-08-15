@@ -1,7 +1,7 @@
 import type { EventSummary, EventDetail } from '#/domain/types/event.types'
 import type { OrganizerEventSummary } from '#/domain/types/organizer.types'
 
-const DEFAULT_IMAGE =
+export const DEFAULT_IMAGE =
   'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1200&auto=format&fit=crop&q=80'
 
 export function mapEventSummaryToEventItem(
@@ -73,12 +73,12 @@ export function mapOrganizerEventToEventItem(
 export function mapStats(
   stats:
     | {
-        totalEvents: number
-        publishedEvents: number
-        totalTicketsSold: number
-        totalRevenue: number
-        upcomingEvents: number
-      }
+      totalEvents: number
+      publishedEvents: number
+      totalTicketsSold: number
+      totalRevenue: number
+      upcomingEvents: number
+    }
     | null
     | undefined,
 ) {
