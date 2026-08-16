@@ -21,11 +21,11 @@ const EVENT_DETAIL_PREFIX = ['event-detail'] as const
 const ORGANIZER_EVENTS_PREFIX = ['organizer-events'] as const
 const ORGANIZER_STATS_PREFIX = ['organizer-stats'] as const
 
-export const usePublishedEvents = (search?: string) =>
+export const usePublishedEvents = () =>
   useSuspenseQuery({
-    queryKey: ['list-events', search],
+    queryKey: ['list-events'],
     queryFn: async () => {
-      const { data } = await eventRepository.listPublished(search)
+      const { data } = await eventRepository.listPublished()
       return data
     },
   })

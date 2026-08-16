@@ -6,8 +6,7 @@ import type {
 import { api } from '../api/apiClient'
 
 export const eventRepository = {
-  listPublished: (search?: string) =>
-    api.get<EventListResponse>('/api/events', { params: search ? { search } : undefined }),
+  listPublished: () => api.get<EventListResponse>('/api/events'),
   getById: (id: string) => api.get<EventDetail>(`/api/events/${id}`),
   create: (payload: CreateEventRequest) =>
     api.post<EventDetail>('/api/events', payload),

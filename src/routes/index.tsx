@@ -38,11 +38,11 @@ function Home() {
   const [search, setSearch] = useState('')
   const normalizedSearch = search.trim()
 
-  const { data } = usePublishedEvents(normalizedSearch || undefined)
+  const { data } = usePublishedEvents()
 
   const events = data.data.map((summary) =>
     mapEventSummaryToEventItem(summary),
-  )
+  ).filter(data => data.title.includes(normalizedSearch) || data.description.includes(normalizedSearch))
 
   const hasSearch = normalizedSearch.length > 0
 
