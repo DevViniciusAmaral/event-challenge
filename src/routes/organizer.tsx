@@ -239,8 +239,7 @@ function OrganizerDashboard() {
                                     "{evt.title}"
                                   </strong>
                                   ? Esta ação é permanente e não poderá ser
-                                  desfeita. Todos os ingressos e dados
-                                  associados serão removidos.
+                                  desfeita.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
