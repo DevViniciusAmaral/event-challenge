@@ -40,9 +40,18 @@ export const createEventSchema = z
         message: 'Preço é obrigatório',
       })
       .min(0, 'Preço não pode ser negativo'),
-    imageUrl: z.url('URL da imagem é inválida').optional().default(DEFAULT_IMAGE),
+    imageUrl: z
+      .union([
+        z.literal(''),
+        z.string().trim().url('URL da imagem é inválida'),
+      ])
+      .default(''),
     publishAfter: z.boolean().default(true),
   })
+  .transform((val) => ({
+    ...val,
+    imageUrl: val.imageUrl?.trim() ? val.imageUrl : DEFAULT_IMAGE,
+  }))
   .superRefine((val, ctx) => {
     if (val.date) {
       const d = new Date(val.date)
