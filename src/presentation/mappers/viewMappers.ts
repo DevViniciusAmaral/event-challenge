@@ -1,4 +1,4 @@
-import type { EventSummary, EventDetail } from '#/domain/types/event.types'
+import type { EventSummary, EventDetail, EventItem } from '#/domain/types/event.types'
 import type { OrganizerEventSummary } from '#/domain/types/organizer.types'
 
 export const DEFAULT_IMAGE =
@@ -7,7 +7,7 @@ export const DEFAULT_IMAGE =
 export function mapEventSummaryToEventItem(
   summary: EventSummary,
   detail?: EventDetail,
-) {
+): EventItem {
   const availableTickets =
     Number((summary as EventSummary & { availables?: number }).availables) ||
     Number(summary.availableTickets) ||
@@ -36,7 +36,7 @@ export function mapEventDetailToEventItem(detail: EventDetail) {
 
 export function mapOrganizerEventToEventItem(
   orgEvent: OrganizerEventSummary,
-) {
+): EventItem {
   const capacity = Number(orgEvent.capacity) || 0
   const ticketPrice = Number(orgEvent.ticketPrice) || 0
 

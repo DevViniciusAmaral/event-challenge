@@ -1,4 +1,21 @@
 export type EventStatus = 'draft' | 'published'
+export type EventType = 'show' | 'cinema'
+
+export interface EventItem {
+  id: string
+  catalogId: string
+  title: string
+  description: string
+  date: string
+  time: string
+  location: string
+  address: string
+  price: number
+  capacity: number
+  available: number
+  image: string
+  type: EventType
+}
 
 export interface EventSummary {
   id: string

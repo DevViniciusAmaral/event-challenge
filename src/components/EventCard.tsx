@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { formatDateTime, formatPrice } from '@/lib/utils'
-import type { EventItem } from '#/utils/mocks'
+import type { EventItem } from '#/domain/types/event.types'
 
 interface EventCardProps {
   event: EventItem
