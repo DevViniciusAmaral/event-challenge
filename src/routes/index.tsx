@@ -36,20 +36,15 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const [search, setSearch] = useState('')
-  const [typeFilter, setTypeFilter] = useState<'all' | 'show' | 'movie'>('all')
+  const normalizedSearch = search.trim()
 
-  const { data } = usePublishedEvents(search.trim() || undefined)
+  const { data } = usePublishedEvents(normalizedSearch || undefined)
 
-  const events =
-    data.data.map((summary) => mapEventSummaryToEventItem(summary)) || []
+  const events = data.data.map((summary) =>
+    mapEventSummaryToEventItem(summary),
+  )
 
-  const filteredEvents = events.filter((evt) => {
-    const matchesSearch =
-      evt.title.toLowerCase().includes(search.toLowerCase()) ||
-      evt.location.toLowerCase().includes(search.toLowerCase())
-    const matchesType = typeFilter === 'all' ? true : evt.type === typeFilter
-    return matchesSearch && matchesType
-  })
+  const hasSearch = normalizedSearch.length > 0
 
   return (
     <PageContainer>
@@ -59,21 +54,22 @@ function Home() {
         withDivider
       />
 
-      <SearchFilter
-        search={search}
-        onSearchChange={setSearch}
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
-      />
+      <SearchFilter search={search} onSearchChange={setSearch} />
 
-      {filteredEvents.length > 0 ? (
+      {events.length > 0 ? (
         <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredEvents.map((evt) => (
+          {events.map((evt) => (
             <EventCard key={evt.id} event={evt} />
           ))}
         </div>
       ) : (
-        <EmptyState message="Nenhum evento encontrado para os filtros selecionados." />
+        <EmptyState
+          message={
+            hasSearch
+              ? 'Nenhum evento encontrado para a busca realizada.'
+              : 'Não existem eventos disponíveis no momento.'
+          }
+        />
       )}
     </PageContainer>
   )
