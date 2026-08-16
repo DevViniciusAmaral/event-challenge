@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CatchNotFound } from '@tanstack/react-router'
-import { useTicketById } from '../presentation/hooks/useTickets'
+import { useTicketById } from '../hooks/useTickets'
 import { TicketCard } from '../components/TicketCard'
 import { PageContainer } from '../components/PageContainer'
 import { BackLink } from '../components/BackLink'

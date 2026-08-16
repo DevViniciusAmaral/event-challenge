@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useCreateEvent, usePublishEvent } from '@/presentation/hooks/useEvents'
+import { useCreateEvent, usePublishEvent } from '#/hooks/useEvents'
 import { successToast } from '@/components/ui/toaster'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'

@@ -3,15 +3,15 @@ import { useState } from 'react'
 import {
   useOrganizerEvents,
   useOrganizerStats,
-} from '../presentation/hooks/useOrganizer'
+} from '../hooks/useOrganizer'
 import {
   mapOrganizerEventToEventItem,
   mapStats,
-} from '../presentation/mappers/viewMappers'
+} from '../utils/viewMappers'
 import { Button } from '@/components/ui/button'
 import { PlusCircle, Trash2 } from 'lucide-react'
 import { CreateEventModal } from '../components/CreateEventModal'
-import { useDeleteEvent } from '../presentation/hooks/useEvents'
+import { useDeleteEvent } from '../hooks/useEvents'
 import {
   AlertDialog,
   AlertDialogAction,

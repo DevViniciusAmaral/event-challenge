@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DEFAULT_IMAGE } from '#/presentation/mappers/viewMappers'
+import { DEFAULT_IMAGE } from '#/utils/viewMappers'
 
 export const createEventSchema = z
   .object({

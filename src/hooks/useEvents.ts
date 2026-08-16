@@ -4,17 +4,17 @@ import {
   useQueryClient,
   type UseMutationOptions,
 } from '@tanstack/react-query'
-import { eventRepository } from '../../data/repositories/event.repository'
+import { eventRepository } from '../data/repositories/event.repository'
 import type {
   CreateEventRequest,
   EventDetail,
   EventSummary,
-} from '../../domain/types/event.types'
+} from '../domain/types/event.types'
 import {
   successToast,
   errorToast,
   extractBackendMessage,
-} from '../../components/ui/toaster'
+} from '../components/ui/toaster'
 
 const EVENT_LIST_PREFIX = ['list-events'] as const
 const EVENT_DETAIL_PREFIX = ['event-detail'] as const

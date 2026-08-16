@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { organizerRepository } from '../../data/repositories/organizer.repository'
+import { organizerRepository } from '../data/repositories/organizer.repository'
 
 export const useOrganizerEvents = () =>
   useSuspenseQuery({

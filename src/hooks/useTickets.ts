@@ -4,18 +4,18 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import type { UseMutationOptions } from '@tanstack/react-query'
-import { ticketRepository } from '../../data/repositories/ticket.repository'
+import { ticketRepository } from '../data/repositories/ticket.repository'
 import type {
   TicketSummary,
   PurchaseTicketRequest,
   ValidateTicketResponse,
-} from '../../domain/types/ticket.types'
+} from '../domain/types/ticket.types'
 import {
   successToast,
   errorToast,
   warningToast,
   extractBackendMessage,
-} from '../../components/ui/toaster'
+} from '../components/ui/toaster'
 
 export const useTicketById = (id: string) =>
   useSuspenseQuery({
