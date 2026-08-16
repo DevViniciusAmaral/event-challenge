@@ -10,7 +10,11 @@ import type {
   EventDetail,
   EventSummary,
 } from '../../domain/types/event.types'
-import { successToast, errorToast } from '../../components/ui/toaster'
+import {
+  successToast,
+  errorToast,
+  extractBackendMessage,
+} from '../../components/ui/toaster'
 
 const EVENT_LIST_PREFIX = ['list-events'] as const
 const EVENT_DETAIL_PREFIX = ['event-detail'] as const
@@ -57,7 +61,8 @@ export const useCreateEvent = (options?: CreateEventOptions) => {
       ;(options as any)?.onSuccess?.(...args)
     },
     onError: (...args: any[]) => {
-      errorToast('Erro ao criar evento')
+      const err = args[0] as unknown
+      errorToast('Erro ao criar evento', extractBackendMessage(err))
       ;(options as any)?.onError?.(...args)
     },
   })
@@ -87,7 +92,8 @@ export const usePublishEvent = (options?: PublishEventOptions) => {
       ;(options as any)?.onSuccess?.(...args)
     },
     onError: (...args: any[]) => {
-      errorToast('Erro ao publicar evento')
+      const err = args[0] as unknown
+      errorToast('Erro ao publicar evento', extractBackendMessage(err))
       ;(options as any)?.onError?.(...args)
     },
   })
@@ -114,7 +120,8 @@ export const useDeleteEvent = (options?: DeleteEventOptions) => {
       ;(options as any)?.onSuccess?.(...args)
     },
     onError: (...args: any[]) => {
-      errorToast('Erro ao excluir evento')
+      const err = args[0] as unknown
+      errorToast('Erro ao excluir evento', extractBackendMessage(err))
       ;(options as any)?.onError?.(...args)
     },
   })
