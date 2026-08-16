@@ -65,7 +65,6 @@ export function CreateEventModal({
   }, [open, reset])
 
   const publishAfter = watch('publishAfter')
-  const image = watch('imageUrl')
 
   const isSubmitting =
     formSubmitting || createMutation.isPending || publishMutation.isPending
@@ -322,11 +321,6 @@ export function CreateEventModal({
             {errors.imageUrl && (
               <p className="mt-1 text-xs text-destructive">
                 {errors.imageUrl.message}
-              </p>
-            )}
-            {image && !errors.imageUrl && (
-              <p className="mt-2 text-xs text-zinc-500 truncate">
-                Prévia: {image}
               </p>
             )}
           </div>

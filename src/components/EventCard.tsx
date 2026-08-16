@@ -28,9 +28,6 @@ export function EventCard({ event }: EventCardProps) {
 
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between mb-2">
-          <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-2xs font-medium text-zinc-600 capitalize">
-            {event.type === 'show' ? 'Show' : 'Cinema'}
-          </span>
           <span className="text-xs text-zinc-500">
             {event.available > 0
               ? `${event.available} disponíveis`
