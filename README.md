@@ -63,7 +63,7 @@ Aplicação abre em [http://localhost:3000](http://localhost:3000).
 
 | Rota | Página | Perfil | O que faz |
 |---|---|---|---|
-| `/` | Home | Cliente | Lista eventos publicados com busca + filtro por tipo (Show/Cinema) |
+| `/` | Home | Cliente | Lista eventos publicados com busca por título/descrição (filtro local) |
 | `/events/$id` | Detalhe do evento | Cliente | Tela com infos, capacidade e formulário de compra de ingresso |
 | `/tickets/$id` | Ingresso | Cliente | Exibe ingresso com QR Code e dados da compra |
 | `/organizer` | Dashboard | Organizador | Métricas, listagem de eventos criados, ações (publicar, excluir, criar novo) |
@@ -84,16 +84,17 @@ src/
 │   ├── BackLink.tsx         # Link "voltar" com ícone
 │   ├── CapacityIndicator.tsx# Barra de disponibilidade do evento
 │   ├── CreateEventModal.tsx # Modal criar + publicar evento (RHF + Zod)
-│   ├── EmptyState.tsx       # Estado "nenhum resultado"
+│   ├── EmptyState.tsx       # Estado "nenhum resultado" — diferencia busca vs. lista vazia
 │   ├── ErrorState.tsx       # Error state + NotFoundState (404)
-│   ├── EventCard.tsx        # Card de evento na home
+│   ├── EventCard.tsx        # Card de evento na home (sem badge de tipo)
 │   ├── FormField.tsx        # FormInput / FormTextarea / FormSelect compartilhados
+│   ├── Header.tsx           # Header fixo global com navegação entre páginas
 │   ├── LoadingState.tsx     # Skeleton loading padrão
 │   ├── MetricCard.tsx       # Card de métrica do organizador
 │   ├── PageContainer.tsx    # Wrapper padrão de página
 │   ├── PageHeader.tsx       # Header com título + descrição + ações
 │   ├── QuantitySelector.tsx # Botões +/- quantidade de ingressos
-│   ├── SearchFilter.tsx     # Barra de busca + filtros tipo
+│   ├── SearchFilter.tsx     # Barra de busca text-only (por título/descrição)
 │   ├── TicketCard.tsx       # Card com QR Code do ingresso
 │   └── not-found.tsx        # Página 404 com redirecionamento automático
 │
@@ -106,30 +107,30 @@ src/
 │
 ├── domain/
 │   ├── types/               # Tipos TypeScript de domínio (puros, sem import de lib)
-│   │   ├── event.types.ts
+│   │   ├── event.types.ts   # EventStatus, EventType, interface EventItem etc.
 │   │   ├── organizer.types.ts
 │   │   └── ticket.types.ts
 │   └── schemas/
-│       └── event.schema.ts  # Schemas Zod de validação (criar evento, checkout)
+│       └── event.schema.ts  # Schemas Zod + transform DEFAULT_IMAGE p/ imageUrl vazia
 │
-├── presentation/
-│   ├── hooks/               # Custom hooks com React Query
-│   │   ├── useEvents.ts     # usePublishedEvents / useEventById / mutations
-│   │   ├── useOrganizer.ts  # useOrganizerEvents / useOrganizerStats
-│   │   └── useTickets.ts    # useTicketById / usePurchaseTicket / useValidateTicket
-│   └── mappers/
-│       └── viewMappers.ts   # DEFAULT_IMAGE + transform domain → View models
+├── hooks/                   # Custom hooks com TanStack Query v5
+│   ├── use-toast.ts         # Hook shadcn/toaster
+│   ├── useEvents.ts         # usePublishedEvents / useEventById / create/publish/delete
+│   ├── useOrganizer.ts      # useOrganizerEvents / useOrganizerStats
+│   └── useTickets.ts        # useTicketById / usePurchaseTicket / useValidateTicket
+│
+├── utils/
+│   └── viewMappers.ts       # DEFAULT_IMAGE + transforms domain → View models tipados
 │
 ├── routes/                  # File-based routing do TanStack Router
-│   ├── __root.tsx           # Root route (QueryClient, layout, defaultNotFound)
-│   ├── index.tsx            # /
+│   ├── __root.tsx           # Root route (QueryClient defaults, Header, notFoundComponent)
+│   ├── index.tsx            # / (home)
 │   ├── events.$id.tsx       # /events/$id
 │   ├── tickets.$id.tsx      # /tickets/$id
 │   ├── organizer.tsx        # /organizer
 │   └── gate.tsx             # /gate
 │
 ├── lib/utils.ts             # cn(), formatPrice(), formatDate(), formatDateTime()
-├── hooks/use-toast.ts       # Hook customizado do shadcn/toaster
 ├── router.tsx               # Criação do router singleton
 └── styles.css               # Tailwind v4 imports + tema base
 ```
@@ -137,11 +138,18 @@ src/
 ### Padrões e convenções
 
 - **Repository pattern**: toda comunicação com API passa por `src/data/repositories/*` — componentes não chamam axios diretamente
-- **Presentation hooks**: `useSuspenseQuery` + `useMutation` do TanStack Query com query keys centralizadas. Invalidação de cache sempre dispara `refetchType: 'all'`
+- **Custom hooks em `src/hooks/*`**: `useSuspenseQuery` + `useMutation` do TanStack Query v5 com query keys centralizadas:
+  - `['list-events']`, `['event-detail', id]`, `['organizer-events']`, `['organizer-stats']`, `['ticket-detail', id]`
+- **QueryClient defaults** (configurado em `__root.tsx`): `staleTime: 0`, `refetchOnMount: true`, queries falham imediatamente em 4xx e retentam 2x em outros erros; mutations sempre têm `retry: false`
+- **Invalidação de cache**: sempre `queryClient.invalidateQueries({ queryKey: prefixo, refetchType: 'all' })`, **um prefixo por chamada** (não usar arrays compostos)
+- **Ordem do spread em useMutation**: `...(options as any)` vem **no começo** do objeto, e `onSuccess`/`onError` internos são declarados DEPOIS. Callbacks do caller são invocados via `options?.onSuccess?.(...args)` usando padrão rest/spread `(...args: any[])` para compatibilidade entre versões
+- **Toasts de erro**: sempre usam `extractBackendMessage(err)` para exibir a mensagem real da API (lê formato `{ error: { code, message } }`)
+- **DEFAULT_IMAGE para imagem vazia**: no `event.schema.ts`, `imageUrl` aceita string vazia via `z.union([z.literal(''), z.string().url()])` e aplica `.transform()` substituindo vazia pela `DEFAULT_IMAGE` de `viewMappers.ts`
 - **React Suspense**: Todas as rotas declaram `pendingComponent` e `errorComponent`/`CatchNotFound` no TanStack Router. Sem `if (isLoading)` ou `if (isError)` inline no JSX
-- **React Hook Form + Zod**: Todos os formulários (criar evento, comprar ingresso, etc.) usam `useForm` + `zodResolver`
-- **Path aliases**: `#/*` e `@/*` ambos apontam para `./src/*` (configurado em `tsconfig.json` + `package.json#imports`)
-- **Commit pattern**: [Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/) — `feat:`, `fix:`, `refactor:`, `chore:`, `docs:` etc.
+- **EmptyState diferenciado**: na home, `EmptyState` mostra mensagem diferente quando é uma busca sem resultados vs. lista vazia da API
+- **React Hook Form + Zod**: Todos os formulários usam `useForm` + `zodResolver` com `mode: 'onTouched'`
+- **Path aliases**: `#/*` e `@/*` ambos apontam para `./src/*`
+- **Commit pattern**: [Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/) — `tipo(escopo): mensagem`
 
 ---
 
