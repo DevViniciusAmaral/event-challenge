@@ -10,7 +10,6 @@ import {
   ToastViewport
   
 } from '@/components/ui/toast'
-import type {ToastProps} from '@/components/ui/toast';
 import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

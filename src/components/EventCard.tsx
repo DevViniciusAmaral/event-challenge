@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { formatDateTime, formatPrice } from '@/lib/utils'
 import type { EventItem } from '#/types/event.types'
-import { Film } from 'lucide-react'
 
 interface EventCardProps {
   event: EventItem
