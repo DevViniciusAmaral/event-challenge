@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, CatchNotFound } from '@tanstack/react-rou
 import { useState } from 'react'
 import { useEventById } from '../hooks/useEvents'
 import { usePurchaseTicket } from '../hooks/useTickets'
-import { mapEventDetailToEventItem, DEFAULT_IMAGE } from '../utils/viewMappers'
+import { mapEventDetailToEventItem } from '../utils/viewMappers'
 import { PageContainer } from '../components/PageContainer'
 import { BackLink } from '../components/BackLink'
 import { NotFoundState } from '../components/ErrorState'
@@ -12,6 +12,7 @@ import { FormInput } from '../components/FormField'
 import { AlertBox } from '../components/AlertBox'
 import { LoadingState } from '../components/LoadingState'
 import { formatDateTime, formatPrice } from '@/lib/utils'
+import { Film } from 'lucide-react'
 
 export const Route = createFileRoute('/events/$id')({
   component: EventDetails,
@@ -80,12 +81,25 @@ function EventDetails() {
       <BackLink to="/" label="Voltar para Eventos" />
 
       <div className="overflow-hidden bg-white border border-zinc-200 rounded-lg">
-        <div className="aspect-[21/9] w-full bg-zinc-100">
-          <img
-            src={DEFAULT_IMAGE}
-            alt={event.movie.name}
-            className="h-full w-full object-cover object-center"
+        <div className="aspect-[21/9] w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-700 flex items-center justify-center relative overflow-hidden">
+          <Film className="h-24 w-24 sm:h-32 sm:w-32 text-white/20" strokeWidth={1.25} />
+          <div
+            className="absolute inset-0 opacity-[0.08]"
+            style={{
+              backgroundImage:
+                'repeating-linear-gradient(45deg, #fff 0 2px, transparent 2px 18px)',
+            }}
           />
+          <div className="absolute bottom-4 left-6 sm:left-8 right-6 sm:right-8 flex flex-wrap items-center justify-between gap-3">
+            <span className="inline-flex items-center rounded-full bg-white/10 backdrop-blur px-3 py-1 text-xs font-medium text-white/90 border border-white/10">
+              Cinema
+            </span>
+            {soldOut && (
+              <span className="inline-flex items-center rounded-full bg-red-500/90 backdrop-blur px-3 py-1 text-xs font-medium text-white border border-red-400/30">
+                Esgotado
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="p-6 sm:p-8">

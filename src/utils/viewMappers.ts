@@ -2,9 +2,6 @@ import type { EventSummary, EventDetail, EventItem, EventMovie } from '#/domain/
 import type { OrganizerEventSummary } from '#/domain/types/organizer.types'
 import type { TicketEventInfo } from '#/domain/types/ticket.types'
 
-export const DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=1200&auto=format&fit=crop&q=80'
-
 type AnyRecord = Record<string, unknown>
 
 const pickStr = (obj: AnyRecord, keys: string[]): string => {

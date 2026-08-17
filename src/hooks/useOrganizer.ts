@@ -6,7 +6,7 @@ export const useOrganizerEvents = () =>
     queryKey: ['organizer-events'],
     queryFn: async () => {
       const { data } = await organizerRepository.listEvents()
-      return data
+      return data.data
     },
   })
 

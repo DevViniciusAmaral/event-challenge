@@ -7,10 +7,9 @@ import {
 import {
   mapOrganizerEventToEventItem,
   mapStats,
-  DEFAULT_IMAGE,
 } from '../utils/viewMappers'
 import { Button } from '@/components/ui/button'
-import { PlusCircle, Trash2 } from 'lucide-react'
+import { Film, PlusCircle, Trash2 } from 'lucide-react'
 import { CreateEventModal } from '../components/CreateEventModal'
 import { useDeleteEvent } from '../hooks/useEvents'
 import {
@@ -79,7 +78,7 @@ function OrganizerDashboard() {
   const { data: stats } = useOrganizerStats()
   const { data: eventsData } = useOrganizerEvents()
 
-  const events = eventsData.data.map(mapOrganizerEventToEventItem)
+  const events = eventsData.map(mapOrganizerEventToEventItem)
   const statsMapped = mapStats(stats)
 
   const {
@@ -181,13 +180,9 @@ function OrganizerDashboard() {
                           <Link
                             to="/events/$id"
                             params={{ id: evt.id }}
-                            className="shrink-0"
+                            className="shrink-0 h-12 w-12 rounded bg-gradient-to-br from-zinc-900 to-zinc-700 flex items-center justify-center hover:ring-2 hover:ring-zinc-900/30 transition"
                           >
-                            <img
-                              src={DEFAULT_IMAGE}
-                              alt={evt.movie.name}
-                              className="h-12 w-12 rounded object-cover hover:ring-2 hover:ring-zinc-900/30 transition"
-                            />
+                            <Film className="h-5 w-5 text-white/80" strokeWidth={2} />
                           </Link>
                           <div className="min-w-0 flex-1">
                             <Link

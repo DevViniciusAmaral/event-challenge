@@ -42,26 +42,26 @@ export const Route = createFileRoute('/gate')({
 })
 
 type ValidationStatus = 'idle' | 'valid' | 'invalid' | 'used'
+interface ValidationResult {
+  status: ValidationStatus
+  ticket?: {
+    id: string
+    code: string
+    buyerName: string
+    event: { id: string; movie: { name: string } }
+  }
+  message?: string
+}
 
 function GateValidation() {
-  const { data: eventsData } = useOrganizerEvents()
-  const events = eventsData.data
+  const { data: events } = useOrganizerEvents()
 
   const [selectedEventId, setSelectedEventId] = useState('')
   const [ticketCode, setTicketCode] = useState('')
 
   const validateMutation = useValidateTicket()
 
-  const [validationResult, setValidationResult] = useState<{
-    status: ValidationStatus
-    ticket?: {
-      id: string
-      code: string
-      buyerName: string
-      event: { id: string; movie: { name: string } }
-    }
-    message?: string
-  }>({ status: 'idle' })
+  const [validationResult, setValidationResult] = useState<ValidationResult>({ status: 'idle' })
 
   const validateByCode = useCallback((code: string) => {
     if (!code.trim()) return
@@ -278,11 +278,11 @@ const bannerStyles: Record<BannerVariant, string> = {
 }
 
 const bannerTextStyles: Record<BannerVariant, { title: string; body: string }> =
-  {
-    success: { title: 'text-emerald-800', body: 'text-emerald-600' },
-    warning: { title: 'text-amber-800', body: 'text-amber-600' },
-    error: { title: 'text-red-800', body: 'text-red-600' },
-  }
+{
+  success: { title: 'text-emerald-800', body: 'text-emerald-600' },
+  warning: { title: 'text-amber-800', body: 'text-amber-600' },
+  error: { title: 'text-red-800', body: 'text-red-600' },
+}
 
 interface ResultBannerProps {
   variant: BannerVariant
