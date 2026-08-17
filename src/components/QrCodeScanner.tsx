@@ -33,6 +33,13 @@ const waitForVideoEl = (
     tick()
   })
 
+type CameraAvailability =
+  | 'checking'
+  | 'available'
+  | 'unavailable'
+  | 'insecure-context'
+  | 'unsupported-api'
+
 export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const readerRef = useRef<BrowserMultiFormatReader | null>(null)
@@ -45,6 +52,9 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [torchSupported, setTorchSupported] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
+  const [cameraAvailability, setCameraAvailability] =
+    useState<CameraAvailability>('checking')
+  const [unavailabilityReason, setUnavailabilityReason] = useState<string>('')
 
   useEffect(() => {
     onCodeDetectedRef.current = onCodeDetected
@@ -53,6 +63,65 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
   useEffect(() => {
     statusRef.current = status
   }, [status])
+
+  useEffect(() => {
+    let cancelled = false
+    const md = (navigator as unknown as { mediaDevices?: MediaDevices })
+      .mediaDevices
+    const isSecure =
+      typeof window !== 'undefined' &&
+      (window.isSecureContext ||
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1')
+
+    if (!isSecure) {
+      setCameraAvailability('insecure-context')
+      setUnavailabilityReason(
+        'Acesso à câmera requer conexão segura (HTTPS) ou localhost.',
+      )
+      return
+    }
+
+    if (!md || typeof md.getUserMedia !== 'function') {
+      setCameraAvailability('unsupported-api')
+      setUnavailabilityReason(
+        'Este navegador não suporta acesso à câmera (MediaDevices API indisponível).',
+      )
+      return
+    }
+
+    const check = async () => {
+      try {
+        const devices = await md.enumerateDevices()
+        const videoInputs = devices.filter((d) => d.kind === 'videoinput')
+        if (cancelled) return
+        if (videoInputs.length === 0) {
+          setCameraAvailability('unavailable')
+          setUnavailabilityReason(
+            'Nenhuma câmera foi detectada neste dispositivo. A leitura por QR Code via câmera não está disponível.',
+          )
+        } else {
+          setCameraAvailability('available')
+          setUnavailabilityReason('')
+        }
+      } catch {
+        if (cancelled) return
+        setCameraAvailability('available')
+        setUnavailabilityReason('')
+      }
+    }
+
+    const listener = () => {
+      void check()
+    }
+    md.addEventListener('devicechange', listener)
+    void check()
+
+    return () => {
+      cancelled = true
+      md.removeEventListener('devicechange', listener)
+    }
+  }, [])
 
   const stopScanner = () => {
     try {
@@ -270,6 +339,45 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
   }, [])
 
   const isActive = status === 'starting' || status === 'scanning'
+  const cameraDisabled = cameraAvailability !== 'available'
+
+  if (cameraAvailability === 'checking') {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-medium text-zinc-500">
+            Validar por QR Code
+          </Label>
+        </div>
+        <div className="relative w-full overflow-hidden border border-dashed rounded-lg bg-zinc-900 aspect-[4/1] border-zinc-200 flex items-center justify-center gap-2 text-xs text-zinc-400">
+          <QrCode className="h-4 w-4" />
+          <span>Verificando câmera...</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="outline" disabled className="flex-1">
+            <Camera className="mr-2 h-4 w-4" />
+            Escanear QR Code
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (cameraDisabled) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-medium text-zinc-500">
+            Validar por QR Code
+          </Label>
+        </div>
+        <div className="relative w-full overflow-hidden border rounded-lg bg-zinc-900 aspect-[4/1] border-zinc-200 flex items-center justify-center gap-2 text-xs text-zinc-500 px-3 text-center">
+          <CameraOff className="h-4 w-4 shrink-0" />
+          <span>{unavailabilityReason || 'Leitura por câmera indisponível.'}</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-3">
