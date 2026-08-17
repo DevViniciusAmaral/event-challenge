@@ -9,7 +9,7 @@ import {
   mapStats,
 } from '../utils/viewMappers'
 import { Button } from '@/components/ui/button'
-import { Film, PlusCircle, Trash2 } from 'lucide-react'
+import { PlusCircle, Trash2 } from 'lucide-react'
 import { CreateEventModal } from '../components/CreateEventModal'
 import { useDeleteEvent } from '../hooks/useEvents'
 import {
