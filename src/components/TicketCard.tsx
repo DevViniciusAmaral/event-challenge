@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import type { TicketDetail } from '../domain/types/ticket.types'
 import { formatDateTime } from '@/lib/utils'
+import { mapTicketEventInfo } from '../utils/viewMappers'
 
 interface TicketCardProps {
   ticket: TicketDetail
@@ -9,7 +10,7 @@ interface TicketCardProps {
 }
 
 export function TicketCard({ ticket, showShareLink = false }: TicketCardProps) {
-  const event = ticket.event
+  const event = mapTicketEventInfo(ticket.event)
   const ticketCode = ticket.code || ticket.id
   const ticketUrl =
     typeof window !== 'undefined'

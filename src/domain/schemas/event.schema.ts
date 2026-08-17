@@ -3,10 +3,6 @@ import type { EventMovie } from '#/domain/types/event.types'
 
 const eventMovieSchema = z.object({
   name: z.string({ message: 'Nome do filme é obrigatório' }).trim().min(1, 'Nome do filme é obrigatório'),
-  youtubeUrl: z.union([
-    z.literal(''),
-    z.string().trim().url('URL do YouTube é inválida'),
-  ]),
   description: z.string().trim().default(''),
 })
 

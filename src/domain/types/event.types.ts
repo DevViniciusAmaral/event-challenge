@@ -3,7 +3,6 @@ export type EventType = 'show' | 'cinema'
 
 export interface EventMovie {
   name: string
-  youtubeUrl: string
   description: string
 }
 
@@ -56,6 +55,5 @@ export interface CreateEventRequest {
 
 export interface MovieCatalogItem {
   name: string
-  youtubeUrl: string
   description: string
 }

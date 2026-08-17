@@ -113,16 +113,6 @@ function EventDetails() {
                 <p className="mt-2 text-sm text-zinc-600 leading-relaxed">
                   {event.movie.description}
                 </p>
-                {event.movie.youtubeUrl && (
-                  <a
-                    href={event.movie.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-zinc-900 hover:underline"
-                  >
-                    Assistir trailer no YouTube
-                  </a>
-                )}
               </div>
 
               <div className="space-y-4 text-sm text-zinc-600">

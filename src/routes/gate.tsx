@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useValidateTicket } from '../hooks/useTickets'
 import { useOrganizerEvents } from '../hooks/useOrganizer'
 import { PageContainer } from '../components/PageContainer'
@@ -7,7 +7,9 @@ import { PageHeader } from '../components/PageHeader'
 import { FormInput, FormSelect } from '../components/FormField'
 import { LoadingState } from '../components/LoadingState'
 import { ErrorState } from '../components/ErrorState'
+import { QrCodeScanner } from '../components/QrCodeScanner'
 import { formatDate } from '@/lib/utils'
+import { mapTicketEventInfo } from '../utils/viewMappers'
 
 export const Route = createFileRoute('/gate')({
   component: GateValidation,
@@ -61,11 +63,9 @@ function GateValidation() {
     message?: string
   }>({ status: 'idle' })
 
-  const handleValidate = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!ticketCode.trim()) return
-
-    validateMutation.mutate(ticketCode.trim(), {
+  const validateByCode = useCallback((code: string) => {
+    if (!code.trim()) return
+    validateMutation.mutate(code.trim(), {
       onSuccess: (data: any) => {
         if (data.valid && data.ticket) {
           setValidationResult({
@@ -81,7 +81,17 @@ function GateValidation() {
         }
       },
     })
+  }, [validateMutation])
+
+  const handleValidate = (e: React.FormEvent) => {
+    e.preventDefault()
+    validateByCode(ticketCode)
   }
+
+  const handleQrCodeDetected = useCallback((code: string) => {
+    setTicketCode(code)
+    validateByCode(code)
+  }, [validateByCode])
 
   const handleCheckIn = () => {
     if (validationResult.status === 'valid') {
@@ -103,6 +113,22 @@ function GateValidation() {
       />
 
       <div className="bg-white border border-zinc-200 rounded-lg p-6 space-y-6">
+        <QrCodeScanner
+          onCodeDetected={handleQrCodeDetected}
+          disabled={validateMutation.isPending}
+        />
+
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center" aria-hidden>
+            <div className="w-full border-t border-zinc-200" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-white px-3 text-xs text-zinc-400 uppercase tracking-widest">
+              ou digite o código manualmente
+            </span>
+          </div>
+        </div>
+
         <form onSubmit={handleValidate} className="space-y-4">
           <div>
             <FormSelect
@@ -294,6 +320,7 @@ interface TicketInfoProps {
 }
 
 function TicketInfo({ ticket }: TicketInfoProps) {
+  const eventInfo = mapTicketEventInfo(ticket.event as unknown as Parameters<typeof mapTicketEventInfo>[0])
   return (
     <div className="border border-zinc-200 rounded-md p-4 space-y-2 text-xs">
       <div className="flex justify-between">
@@ -302,7 +329,7 @@ function TicketInfo({ ticket }: TicketInfoProps) {
       </div>
       <div className="flex justify-between">
         <span className="text-zinc-500">Evento</span>
-        <span className="font-medium text-zinc-900">{ticket.event.movie.name}</span>
+        <span className="font-medium text-zinc-900">{eventInfo.movie.name}</span>
       </div>
       {ticket.code && (
         <div className="flex justify-between">
