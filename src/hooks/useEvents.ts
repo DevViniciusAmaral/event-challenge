@@ -2,8 +2,8 @@ import {
   useSuspenseQuery,
   useMutation,
   useQueryClient,
-  type UseMutationOptions,
 } from '@tanstack/react-query'
+import type { UseMutationOptions } from '@tanstack/react-query'
 import { eventRepository } from '../data/repositories/event.repository'
 import type {
   CreateEventRequest,
@@ -40,7 +40,7 @@ export const useEventById = (id: string) =>
   })
 
 type CreateEventOptions = Omit<
-  UseMutationOptions<EventSummary, Error, CreateEventRequest, unknown>,
+  UseMutationOptions<EventDetail, Error, CreateEventRequest, unknown>,
   'mutationFn'
 >
 
@@ -69,7 +69,7 @@ export const useCreateEvent = (options?: CreateEventOptions) => {
 }
 
 type PublishEventOptions = Omit<
-  UseMutationOptions<EventSummary, Error, string, unknown>,
+  UseMutationOptions<EventDetail, Error, string, unknown>,
   'mutationFn'
 >
 

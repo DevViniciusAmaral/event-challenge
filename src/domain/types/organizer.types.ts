@@ -1,3 +1,5 @@
+import type { EventMovie, EventStatus } from './event.types'
+
 export interface OrganizerStats {
   totalEvents: number
   publishedEvents: number
@@ -8,21 +10,20 @@ export interface OrganizerStats {
 
 export interface OrganizerEventSummary {
   id: string
-  title: string
-  status: 'draft' | 'published'
+  movie: EventMovie
   date: string
-  time: string
-  venue: string
+  hours: string
+  local: string
   capacity: number
-  ticketPrice: number
+  price: number
+  status: EventStatus
+  availableTickets: number
   ticketsSold?: number
-  availableTickets?: number
   availables?: number
   ticketsSoldCount?: number
   totalRevenue?: number
-  imageUrl?: string
-  description?: string
-  address?: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface OrganizerEventListResponse {

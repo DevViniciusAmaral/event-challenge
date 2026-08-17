@@ -1,5 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { CatchNotFound } from '@tanstack/react-router'
+import { createFileRoute, CatchNotFound } from '@tanstack/react-router'
 import { useTicketById } from '../hooks/useTickets'
 import { TicketCard } from '../components/TicketCard'
 import { PageContainer } from '../components/PageContainer'
@@ -26,10 +25,6 @@ export const Route = createFileRoute('/tickets/$id')({
 function TicketView() {
   const { id } = Route.useParams()
   const { data: ticket } = useTicketById(id)
-
-  if (!ticket) {
-    return <NotFoundState title="Ingresso não encontrado" />
-  }
 
   return (
     <PageContainer maxWidth="md">

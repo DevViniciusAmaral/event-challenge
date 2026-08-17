@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { formatDateTime, formatPrice } from '@/lib/utils'
+import { DEFAULT_IMAGE } from '#/utils/viewMappers'
 import type { EventItem } from '#/domain/types/event.types'
 
 interface EventCardProps {
@@ -7,14 +8,14 @@ interface EventCardProps {
 }
 
 export function EventCard({ event }: EventCardProps) {
-  const soldOut = event.available <= 0
+  const soldOut = event.availableTickets <= 0
 
   return (
     <div className="group relative flex flex-col overflow-hidden bg-white border border-zinc-200 rounded-lg">
       <div className="aspect-video w-full overflow-hidden bg-zinc-100 group-hover:opacity-95 transition-opacity relative">
         <img
-          src={event.image}
-          alt={event.title}
+          src={DEFAULT_IMAGE}
+          alt={event.movie.name}
           className="h-full w-full object-cover object-center"
         />
         {soldOut && (
@@ -29,24 +30,24 @@ export function EventCard({ event }: EventCardProps) {
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-zinc-500">
-            {event.available > 0
-              ? `${event.available} disponíveis`
+            {event.availableTickets > 0
+              ? `${event.availableTickets} disponíveis`
               : 'Esgotado'}
           </span>
         </div>
 
         <h3 className="text-base font-medium text-zinc-950 line-clamp-1 mb-2">
-          {event.title}
+          {event.movie.name}
         </h3>
 
         <p className="text-xs text-zinc-500 line-clamp-2 flex-grow mb-4">
-          {event.description}
+          {event.movie.description}
         </p>
 
         <div className="border-t border-zinc-100 pt-4 mt-auto flex items-center justify-between">
           <div className="text-xs text-zinc-500 space-y-0.5">
-            <div>{formatDateTime(event.date, event.time)}</div>
-            <div className="line-clamp-1">{event.location}</div>
+            <div>{formatDateTime(event.date, event.hours)}</div>
+            <div className="line-clamp-1">{event.local}</div>
           </div>
           <div className="text-right">
             <div className="text-sm font-semibold text-zinc-900">

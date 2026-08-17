@@ -7,6 +7,7 @@ import {
 import {
   mapOrganizerEventToEventItem,
   mapStats,
+  DEFAULT_IMAGE,
 } from '../utils/viewMappers'
 import { Button } from '@/components/ui/button'
 import { PlusCircle, Trash2 } from 'lucide-react'
@@ -78,7 +79,7 @@ function OrganizerDashboard() {
   const { data: stats } = useOrganizerStats()
   const { data: eventsData } = useOrganizerEvents()
 
-  const events = eventsData?.data.map(mapOrganizerEventToEventItem) || []
+  const events = eventsData.data.map(mapOrganizerEventToEventItem)
   const statsMapped = mapStats(stats)
 
   const {
@@ -93,12 +94,12 @@ function OrganizerDashboard() {
 
   const listSoldSum = events.reduce((sum, evt) => {
     const cap = Number(evt.capacity) || 0
-    const av = Number(evt.available) || 0
+    const av = Number(evt.availableTickets) || 0
     return sum + Math.max(0, cap - av)
   }, 0)
   const listRevenueSum = events.reduce((sum, evt) => {
     const cap = Number(evt.capacity) || 0
-    const av = Number(evt.available) || 0
+    const av = Number(evt.availableTickets) || 0
     const price = Number(evt.price) || 0
     return sum + Math.max(0, cap - av) * price
   }, 0)
@@ -108,7 +109,7 @@ function OrganizerDashboard() {
 
   events.forEach((evt) => {
     const cap = Number(evt.capacity) || 0
-    const av = Number(evt.available) || 0
+    const av = Number(evt.availableTickets) || 0
     const price = Number(evt.price) || 0
     let sold = Math.max(0, cap - av)
     let revenue = sold * price
@@ -183,8 +184,8 @@ function OrganizerDashboard() {
                             className="shrink-0"
                           >
                             <img
-                              src={evt.image}
-                              alt={evt.title}
+                              src={DEFAULT_IMAGE}
+                              alt={evt.movie.name}
                               className="h-12 w-12 rounded object-cover hover:ring-2 hover:ring-zinc-900/30 transition"
                             />
                           </Link>
@@ -194,12 +195,12 @@ function OrganizerDashboard() {
                               params={{ id: evt.id }}
                               className="text-sm font-medium text-zinc-950 hover:text-zinc-700 hover:underline truncate block"
                             >
-                              {evt.title}
+                              {evt.movie.name}
                             </Link>
                             <div className="flex gap-3 mt-1 text-xs text-zinc-500 flex-wrap">
                               <span>{formatDate(evt.date)}</span>
                               <span>&bull;</span>
-                              <span className="truncate">{evt.location}</span>
+                              <span className="truncate">{evt.local}</span>
                             </div>
                           </div>
                         </div>
@@ -219,7 +220,7 @@ function OrganizerDashboard() {
                                 size="icon"
                                 className="h-9 w-9 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md"
                                 disabled={isDeleting}
-                                aria-label={`Excluir evento ${evt.title}`}
+                                aria-label={`Excluir evento ${evt.movie.name}`}
                               >
                                 {isDeleting ? (
                                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
@@ -236,7 +237,7 @@ function OrganizerDashboard() {
                                 <AlertDialogDescription>
                                   Tem certeza que deseja excluir{' '}
                                   <strong className="text-zinc-900">
-                                    "{evt.title}"
+                                    "{evt.movie.name}"
                                   </strong>
                                   ? Esta ação é permanente e não poderá ser
                                   desfeita.

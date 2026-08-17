@@ -1,9 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, CatchNotFound } from '@tanstack/react-router'
 import { useState } from 'react'
-import { CatchNotFound } from '@tanstack/react-router'
 import { useEventById } from '../hooks/useEvents'
 import { usePurchaseTicket } from '../hooks/useTickets'
-import { mapEventDetailToEventItem } from '../utils/viewMappers'
+import { mapEventDetailToEventItem, DEFAULT_IMAGE } from '../utils/viewMappers'
 import { PageContainer } from '../components/PageContainer'
 import { BackLink } from '../components/BackLink'
 import { NotFoundState } from '../components/ErrorState'
@@ -71,18 +70,10 @@ function EventDetails() {
     })
   }
 
-  if (!event) {
-    return (
-      <NotFoundState
-        title="Evento não encontrado"
-        backLabel="Voltar para a página inicial"
-      />
-    )
-  }
-
   const unitPrice = event.price
   const total = unitPrice * qty
   const isSubmitting = purchaseMutation.isPending
+  const soldOut = event.availableTickets <= 0
 
   return (
     <PageContainer maxWidth="5xl">
@@ -91,18 +82,18 @@ function EventDetails() {
       <div className="overflow-hidden bg-white border border-zinc-200 rounded-lg">
         <div className="aspect-[21/9] w-full bg-zinc-100">
           <img
-            src={event.image}
-            alt={event.title}
+            src={DEFAULT_IMAGE}
+            alt={event.movie.name}
             className="h-full w-full object-cover object-center"
           />
         </div>
 
         <div className="p-6 sm:p-8">
           <div className="flex items-center space-x-2 mb-4">
-            <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-800 capitalize">
-              {event.type === 'show' ? 'Show' : 'Cinema'}
+            <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-800">
+              Cinema
             </span>
-            {event.available === 0 && (
+            {soldOut && (
               <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
                 Esgotado
               </span>
@@ -110,18 +101,28 @@ function EventDetails() {
           </div>
 
           <h1 className="text-2xl font-semibold text-zinc-950 sm:text-3xl mb-4">
-            {event.title}
+            {event.movie.name}
           </h1>
 
           <div className="grid gap-8 md:grid-cols-3 md:border-t md:border-zinc-100 md:pt-8">
             <div className="md:col-span-2 space-y-6">
               <div>
                 <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                  Sobre o evento
+                  Sobre o filme
                 </h3>
                 <p className="mt-2 text-sm text-zinc-600 leading-relaxed">
-                  {event.description}
+                  {event.movie.description}
                 </p>
+                {event.movie.youtubeUrl && (
+                  <a
+                    href={event.movie.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-zinc-900 hover:underline"
+                  >
+                    Assistir trailer no YouTube
+                  </a>
+                )}
               </div>
 
               <div className="space-y-4 text-sm text-zinc-600">
@@ -141,7 +142,7 @@ function EventDetails() {
                   </svg>
                   <div>
                     <p className="font-medium text-zinc-900">
-                      {formatDateTime(event.date, event.time)}
+                      {formatDateTime(event.date, event.hours)}
                     </p>
                   </div>
                 </div>
@@ -165,17 +166,14 @@ function EventDetails() {
                     />
                   </svg>
                   <div>
-                    <p className="font-medium text-zinc-900">{event.location}</p>
-                    {event.address && (
-                      <p className="text-zinc-500 mt-0.5">{event.address}</p>
-                    )}
+                    <p className="font-medium text-zinc-900">{event.local}</p>
                   </div>
                 </div>
               </div>
 
               {event.capacity > 0 && (
                 <CapacityIndicator
-                  available={event.available}
+                  available={event.availableTickets}
                   capacity={event.capacity}
                 />
               )}
@@ -197,8 +195,8 @@ function EventDetails() {
                     value={qty}
                     onChange={setQty}
                     min={1}
-                    max={Math.max(1, event.available || 1)}
-                    disabled={event.available === 0}
+                    max={Math.max(1, event.availableTickets || 1)}
+                    disabled={soldOut}
                   />
 
                   <FormInput
@@ -206,7 +204,7 @@ function EventDetails() {
                     id="buyerName"
                     type="text"
                     required
-                    disabled={isSubmitting || event.available === 0}
+                    disabled={isSubmitting || soldOut}
                     value={buyerName}
                     onChange={(e) => setBuyerName(e.target.value)}
                     placeholder="Quem vai utilizar?"
@@ -217,7 +215,7 @@ function EventDetails() {
                     id="buyerEmail"
                     type="email"
                     required
-                    disabled={isSubmitting || event.available === 0}
+                    disabled={isSubmitting || soldOut}
                     value={buyerEmail}
                     onChange={(e) => setBuyerEmail(e.target.value)}
                     placeholder="voce@exemplo.com"
@@ -233,11 +231,11 @@ function EventDetails() {
                   <button
                     type="submit"
                     disabled={
-                      isSubmitting || event.available === 0 || !buyerName || !buyerEmail
+                      isSubmitting || soldOut || !buyerName || !buyerEmail
                     }
                     className="w-full rounded bg-zinc-900 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {event.available === 0
+                    {soldOut
                       ? 'Ingressos esgotados'
                       : isSubmitting
                         ? 'Processando...'

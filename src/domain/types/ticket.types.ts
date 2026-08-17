@@ -1,11 +1,13 @@
+import type { EventMovie } from './event.types'
+
 export type TicketStatus = 'valid' | 'used'
 
 export interface TicketEventInfo {
   id: string
-  title: string
+  movie: EventMovie
   date: string
-  time: string
-  venue: string
+  hours: string
+  local: string
 }
 
 export interface TicketSummary {
@@ -38,7 +40,7 @@ export interface ValidateTicketResponse {
     buyerName: string
     event: {
       id: string
-      title: string
+      movie: EventMovie
     }
   }
 }

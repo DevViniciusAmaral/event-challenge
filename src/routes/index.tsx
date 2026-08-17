@@ -42,7 +42,7 @@ function Home() {
 
   const events = data.data.map((summary) =>
     mapEventSummaryToEventItem(summary),
-  ).filter(data => data.title.includes(normalizedSearch) || data.description.includes(normalizedSearch))
+  ).filter(evt => evt.movie.name.includes(normalizedSearch) || evt.movie.description.includes(normalizedSearch))
 
   const hasSearch = normalizedSearch.length > 0
 

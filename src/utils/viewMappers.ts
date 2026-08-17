@@ -13,24 +13,25 @@ export function mapEventSummaryToEventItem(
     Number(summary.availableTickets) ||
     0
 
+  const source = detail || summary
+
   return {
     id: summary.id,
-    catalogId: '',
-    title: summary.title,
-    description: detail?.description || '',
-    date: detail?.date || '',
-    time: detail?.time || '',
-    location: detail?.venue || '',
-    address: detail?.address || '',
-    price: summary.ticketPrice,
-    capacity: detail?.capacity ?? availableTickets,
-    available: availableTickets,
-    image: detail?.imageUrl || DEFAULT_IMAGE,
-    type: 'show',
+    movie: source.movie,
+    date: source.date,
+    hours: source.hours,
+    local: source.local,
+    capacity: source.capacity,
+    price: source.price,
+    status: source.status,
+    availableTickets,
+    organizerId: detail?.organizerId || '',
+    createdAt: source.createdAt,
+    updatedAt: source.updatedAt,
   }
 }
 
-export function mapEventDetailToEventItem(detail: EventDetail) {
+export function mapEventDetailToEventItem(detail: EventDetail): EventItem {
   return mapEventSummaryToEventItem(detail, detail)
 }
 
@@ -38,35 +39,25 @@ export function mapOrganizerEventToEventItem(
   orgEvent: OrganizerEventSummary,
 ): EventItem {
   const capacity = Number(orgEvent.capacity) || 0
-  const ticketPrice = Number(orgEvent.ticketPrice) || 0
-
-  const ticketsSold =
-    Number(orgEvent.ticketsSold) ||
-    Number(orgEvent.ticketsSoldCount) ||
-    (typeof orgEvent.availableTickets === 'number'
-      ? Math.max(0, capacity - Number(orgEvent.availableTickets))
-      : 0)
-
   const available =
     Number(orgEvent.availables) ||
     (typeof orgEvent.availableTickets === 'number'
       ? Number(orgEvent.availableTickets)
-      : Math.max(0, capacity - ticketsSold))
+      : 0)
 
   return {
     id: orgEvent.id,
-    catalogId: '',
-    title: orgEvent.title,
-    description: orgEvent.description || '',
+    movie: orgEvent.movie,
     date: orgEvent.date,
-    time: orgEvent.time,
-    location: orgEvent.venue,
-    address: orgEvent.address || '',
-    price: ticketPrice,
+    hours: orgEvent.hours,
+    local: orgEvent.local,
     capacity,
-    available,
-    image: orgEvent.imageUrl || DEFAULT_IMAGE,
-    type: 'show',
+    price: orgEvent.price,
+    status: orgEvent.status,
+    availableTickets: available,
+    organizerId: '',
+    createdAt: orgEvent.createdAt,
+    updatedAt: orgEvent.updatedAt,
   }
 }
 

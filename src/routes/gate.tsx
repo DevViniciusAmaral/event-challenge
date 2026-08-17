@@ -43,7 +43,7 @@ type ValidationStatus = 'idle' | 'valid' | 'invalid' | 'used'
 
 function GateValidation() {
   const { data: eventsData } = useOrganizerEvents()
-  const events = eventsData?.data ?? []
+  const events = eventsData.data
 
   const [selectedEventId, setSelectedEventId] = useState('')
   const [ticketCode, setTicketCode] = useState('')
@@ -56,7 +56,7 @@ function GateValidation() {
       id: string
       code: string
       buyerName: string
-      event: { id: string; title: string }
+      event: { id: string; movie: { name: string } }
     }
     message?: string
   }>({ status: 'idle' })
@@ -66,7 +66,7 @@ function GateValidation() {
     if (!ticketCode.trim()) return
 
     validateMutation.mutate(ticketCode.trim(), {
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         if (data.valid && data.ticket) {
           setValidationResult({
             status: 'valid',
@@ -119,7 +119,7 @@ function GateValidation() {
               ) : (
                 events.map((evt) => (
                   <option key={evt.id} value={evt.id}>
-                    {evt.title} ({formatDate(evt.date)})
+                    {evt.movie.name} ({formatDate(evt.date)})
                   </option>
                 ))
               )}
@@ -288,7 +288,7 @@ function ResultBanner({ variant, icon, title, message }: ResultBannerProps) {
 interface TicketInfoProps {
   ticket: {
     buyerName: string
-    event: { title: string }
+    event: { movie: { name: string } }
     code?: string
   }
 }
@@ -302,7 +302,7 @@ function TicketInfo({ ticket }: TicketInfoProps) {
       </div>
       <div className="flex justify-between">
         <span className="text-zinc-500">Evento</span>
-        <span className="font-medium text-zinc-900">{ticket.event.title}</span>
+        <span className="font-medium text-zinc-900">{ticket.event.movie.name}</span>
       </div>
       {ticket.code && (
         <div className="flex justify-between">

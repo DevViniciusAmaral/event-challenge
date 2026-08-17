@@ -58,7 +58,7 @@ export function TicketCard({ ticket, showShareLink = false }: TicketCardProps) {
               Ingresso {ticket.status === 'valid' ? 'Válido' : 'Utilizado'}
             </span>
             <h2 className="mt-4 text-lg font-semibold text-zinc-950 line-clamp-2">
-              {event.title}
+              {event.movie.name}
             </h2>
           </div>
 
@@ -68,13 +68,13 @@ export function TicketCard({ ticket, showShareLink = false }: TicketCardProps) {
             <div>
               <p className="font-medium text-zinc-400">Data e Hora</p>
               <p className="mt-1 text-zinc-900 font-medium">
-                {formatDateTime(event.date, event.time)}
+                {formatDateTime(event.date, event.hours)}
               </p>
             </div>
             <div>
               <p className="font-medium text-zinc-400">Local</p>
               <p className="mt-1 text-zinc-900 font-medium line-clamp-1">
-                {event.venue}
+                {event.local}
               </p>
             </div>
             <div>

@@ -1,40 +1,42 @@
 export type EventStatus = 'draft' | 'published'
 export type EventType = 'show' | 'cinema'
 
+export interface EventMovie {
+  name: string
+  youtubeUrl: string
+  description: string
+}
+
 export interface EventItem {
   id: string
-  catalogId: string
-  title: string
-  description: string
+  movie: EventMovie
   date: string
-  time: string
-  location: string
-  address: string
-  price: number
+  hours: string
+  local: string
   capacity: number
-  available: number
-  image: string
-  type: EventType
+  price: number
+  status: EventStatus
+  availableTickets: number
+  organizerId: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface EventSummary {
   id: string
-  title: string
+  movie: EventMovie
+  date: string
+  hours: string
+  local: string
+  capacity: number
+  price: number
   status: EventStatus
-  ticketPrice: number
   availableTickets: number
-  availables: number
+  createdAt: string
+  updatedAt: string
 }
 
 export interface EventDetail extends EventSummary {
-  description: string
-  imageUrl?: string
-  date: string
-  time: string
-  venue: string
-  address: string
-  capacity: number
-  ticketsSold: number
   organizerId: string
 }
 
@@ -44,13 +46,16 @@ export interface EventListResponse {
 }
 
 export interface CreateEventRequest {
-  title: string
-  description: string
-  imageUrl?: string
+  movie: EventMovie
   date: string
-  time: string
-  venue: string
-  address: string
+  hours: string
+  local: string
   capacity: number
-  ticketPrice: number
+  price: number
+}
+
+export interface MovieCatalogItem {
+  name: string
+  youtubeUrl: string
+  description: string
 }

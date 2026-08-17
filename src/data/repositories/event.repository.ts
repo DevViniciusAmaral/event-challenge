@@ -13,3 +13,4 @@ export const eventRepository = {
   publish: (id: string) => api.patch<EventDetail>(`/api/events/${id}/publish`),
   delete: (id: string) => api.delete<void>(`/api/events/${id}`),
 } as const
+
