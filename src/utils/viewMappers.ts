@@ -1,6 +1,6 @@
-import type { EventSummary, EventDetail, EventItem, EventMovie } from '#/domain/types/event.types'
-import type { OrganizerEventSummary } from '#/domain/types/organizer.types'
-import type { TicketEventInfo } from '#/domain/types/ticket.types'
+import type { EventSummary, EventDetail, EventItem, EventMovie } from '#/types/event.types'
+import type { OrganizerEventSummary } from '#/types/organizer.types'
+import type { TicketEventInfo } from '#/types/ticket.types'
 
 type AnyRecord = Record<string, unknown>
 

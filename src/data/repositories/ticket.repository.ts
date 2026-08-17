@@ -4,7 +4,7 @@ import type {
   TicketSummary,
   PurchaseTicketRequest,
   ValidateTicketResponse,
-} from '../../domain/types/ticket.types'
+} from '../../types/ticket.types'
 
 export const ticketRepository = {
   purchase: (eventId: string, payload: PurchaseTicketRequest) =>

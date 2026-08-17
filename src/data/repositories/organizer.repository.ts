@@ -3,7 +3,7 @@ import { api } from '../api/apiClient'
 import type {
   OrganizerStats,
   OrganizerEventListResponse,
-} from '../../domain/types/organizer.types'
+} from '../../types/organizer.types'
 
 export const organizerRepository = {
   listEvents: () =>

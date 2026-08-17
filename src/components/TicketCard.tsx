@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import type { TicketDetail } from '../domain/types/ticket.types'
+import type { TicketDetail } from '../types/ticket.types'
 import { formatDateTime } from '@/lib/utils'
 import { mapTicketEventInfo } from '../utils/viewMappers'
 

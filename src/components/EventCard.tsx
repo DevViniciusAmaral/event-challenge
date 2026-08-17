@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { formatDateTime, formatPrice } from '@/lib/utils'
-import type { EventItem } from '#/domain/types/event.types'
+import type { EventItem } from '#/types/event.types'
 import { Film } from 'lucide-react'
 
 interface EventCardProps {
@@ -12,26 +12,6 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <div className="group relative flex flex-col overflow-hidden bg-white border border-zinc-200 rounded-lg">
-      <div className="aspect-video w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-700 group-hover:opacity-95 transition-opacity relative flex items-center justify-center overflow-hidden">
-        <Film className="h-16 w-16 text-white/20" strokeWidth={1.5} />
-        <div className="absolute inset-0 opacity-[0.08]"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(45deg, #fff 0 2px, transparent 2px 14px)',
-          }}
-        />
-        <div className="absolute top-3 left-3 inline-flex items-center rounded-full bg-white/10 backdrop-blur px-2.5 py-0.5 text-[11px] font-medium text-white/90 border border-white/10">
-          Cinema
-        </div>
-        {soldOut && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="inline-flex items-center rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white">
-              Esgotado
-            </span>
-          </div>
-        )}
-      </div>
-
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-zinc-500">

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { EventMovie } from '#/domain/types/event.types'
+import type { EventMovie } from '#/types/event.types'
 
 const eventMovieSchema = z.object({
   name: z.string({ message: 'Nome do filme é obrigatório' }).trim().min(1, 'Nome do filme é obrigatório'),

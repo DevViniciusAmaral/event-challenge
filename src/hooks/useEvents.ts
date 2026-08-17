@@ -8,8 +8,7 @@ import { eventRepository } from '../data/repositories/event.repository'
 import type {
   CreateEventRequest,
   EventDetail,
-  EventSummary,
-} from '../domain/types/event.types'
+} from '../types/event.types'
 import {
   successToast,
   errorToast,

@@ -1,4 +1,4 @@
-import type { MovieCatalogItem } from '../../domain/types/event.types'
+import type { MovieCatalogItem } from '../../types/event.types'
 import { api } from '../api/apiClient'
 
 export const movieRepository = {

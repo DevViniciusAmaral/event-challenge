@@ -2,7 +2,7 @@ import type {
   EventListResponse,
   EventDetail,
   CreateEventRequest,
-} from '../../domain/types/event.types'
+} from '../../types/event.types'
 import { api } from '../api/apiClient'
 
 export const eventRepository = {

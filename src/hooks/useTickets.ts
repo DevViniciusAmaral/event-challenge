@@ -9,7 +9,7 @@ import type {
   TicketSummary,
   PurchaseTicketRequest,
   ValidateTicketResponse,
-} from '../domain/types/ticket.types'
+} from '../types/ticket.types'
 import {
   successToast,
   errorToast,

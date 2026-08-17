@@ -24,9 +24,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createEventSchema
-} from '#/domain/schemas/event.schema'
-import type { CreateEventSchema } from '#/domain/schemas/event.schema'
-import type { EventMovie, MovieCatalogItem } from '#/domain/types/event.types'
+} from '#/schemas/event.schema'
+import type { CreateEventSchema } from '#/schemas/event.schema'
+import type { EventMovie, MovieCatalogItem } from '#/types/event.types'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { cn } from '@/lib/utils'

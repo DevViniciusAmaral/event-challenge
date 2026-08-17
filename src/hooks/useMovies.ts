@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { movieRepository } from '../data/repositories/movie.repository'
-import type { MovieCatalogItem } from '../domain/types/event.types'
+import type { MovieCatalogItem } from '../types/event.types'
 
 export const MOVIES_PREFIX = ['movies'] as const
 
