@@ -175,11 +175,6 @@ export function CreateEventModal({
                     void trigger('movie')
                   }}
                   disabled={isSubmitting}
-                  // onOpenChange={(isOpen) => {
-                  //   if (!isOpen) {
-                  //     setValue('movie', field.value, { shouldTouch: true })
-                  //   }
-                  // }}
                 >
                   <SelectTrigger
                     id="modal-movie"
