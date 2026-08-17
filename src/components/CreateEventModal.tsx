@@ -20,7 +20,7 @@ import { Film } from 'lucide-react'
 import { useCreateEvent, usePublishEvent } from '#/hooks/useEvents'
 import { useMovies } from '#/hooks/useMovies'
 import { successToast } from '@/components/ui/toaster'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   createEventSchema
@@ -72,7 +72,6 @@ export function CreateEventModal({
   })
 
   const watchedMovie = watch('movie')
-  const selectedMovieName = watchedMovie.name
 
   useEffect(() => {
     if (open) {
@@ -81,8 +80,6 @@ export function CreateEventModal({
   }, [open, reset])
 
   const publishAfter = watch('publishAfter')
-  const watchDate = watch('date')
-  const watchHours = watch('hours')
 
   const isSubmitting =
     formSubmitting || createMutation.isPending || publishMutation.isPending
