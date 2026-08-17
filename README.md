@@ -2,7 +2,9 @@
 
 Projeto fullstack de plataforma de eventos com três fluxos principais: **Organizador** (cria e publica eventos), **Cliente** (busca, reserva e compra ingressos) e **Portaria** (valida ingressos na entrada, inclusive por câmera/QR Code). Desenvolvido com **TanStack Start**, **React 19**, **Vite 8**, **Tailwind CSS v4** e **TypeScript strict mode**.
 
-Escopo do desafio técnico e regras de avaliação em [CHALLENGE.md](file:///C:/Users/vinia/projects/event-challenge/CHALLENGE.md).
+---
+
+[Escopo do desafio técnico](/CHALLENGE.md) & [Documentação e código da API](https://github.com/DevViniciusAmaral/event-challenge-api)
 
 ---
 
@@ -34,7 +36,7 @@ npm install
 Crie um arquivo `.env` na raiz do projeto (já está no `.gitignore`) com a URL da API:
 
 ```env
-VITE_API_URL=http://localhost:8080/api
+VITE_API_URL=http://localhost:3001/api
 ```
 
 > `VITE_API_URL` é obrigatória. Sem ela, nenhuma operação de create/publish/delete/listar eventos ou comprar/validar ingressos funciona.
