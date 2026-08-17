@@ -177,13 +177,6 @@ function OrganizerDashboard() {
                     >
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex gap-4 min-w-0 flex-1">
-                          <Link
-                            to="/events/$id"
-                            params={{ id: evt.id }}
-                            className="shrink-0 h-12 w-12 rounded bg-gradient-to-br from-zinc-900 to-zinc-700 flex items-center justify-center hover:ring-2 hover:ring-zinc-900/30 transition"
-                          >
-                            <Film className="h-5 w-5 text-white/80" strokeWidth={2} />
-                          </Link>
                           <div className="min-w-0 flex-1">
                             <Link
                               to="/events/$id"
