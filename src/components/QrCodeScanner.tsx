@@ -12,12 +12,34 @@ interface QrCodeScannerProps {
 
 type ScanStatus = 'idle' | 'starting' | 'scanning' | 'error'
 
+const waitForVideoEl = (
+  getVideo: () => HTMLVideoElement | null,
+  timeoutMs = 3000,
+) =>
+  new Promise<HTMLVideoElement>((resolve, reject) => {
+    const start = Date.now()
+    const tick = () => {
+      const el = getVideo()
+      if (el) {
+        resolve(el)
+        return
+      }
+      if (Date.now() - start > timeoutMs) {
+        reject(new Error('video-element-timeout'))
+        return
+      }
+      window.requestAnimationFrame(tick)
+    }
+    tick()
+  })
+
 export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const readerRef = useRef<BrowserMultiFormatReader | null>(null)
   const controlsRef = useRef<IScannerControls | null>(null)
   const statusRef = useRef<ScanStatus>('idle')
   const onCodeDetectedRef = useRef(onCodeDetected)
+  const startingRef = useRef(false)
 
   const [status, setStatus] = useState<ScanStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string>('')
@@ -41,13 +63,147 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
     } catch {
       // noop
     }
+    startingRef.current = false
     setTorchOn(false)
     setTorchSupported(false)
     setStatus('idle')
   }
 
+  const runScanner = async () => {
+    if (startingRef.current) return
+    startingRef.current = true
+    setErrorMessage('')
+
+    try {
+      const video = await waitForVideoEl(() => videoRef.current, 4000)
+
+      if (!readerRef.current) {
+        readerRef.current = new BrowserMultiFormatReader()
+      }
+
+      const controls = await readerRef.current.decodeFromVideoDevice(
+        undefined,
+        video,
+        (result, _err, ctrl) => {
+          const st = statusRef.current
+          if (st !== 'scanning' && st !== 'starting') return
+          if (result && result.getText()) {
+            const code = result.getText().trim()
+            if (code) {
+              try {
+                ctrl.stop()
+              } catch {
+                // noop
+              }
+              controlsRef.current = null
+              startingRef.current = false
+              setTorchOn(false)
+              setTorchSupported(false)
+              setStatus('idle')
+              onCodeDetectedRef.current(code)
+            }
+          }
+        },
+      )
+
+      controlsRef.current = controls
+
+      try {
+        const stream = video.srcObject as MediaStream | null
+        if (stream) {
+          const tracks = stream.getVideoTracks()
+          if (tracks.length > 0) {
+            const track = tracks[0]
+            const settings = track.getSettings()
+            const hasTorch =
+              typeof (settings as unknown as { torch?: boolean }).torch ===
+              'boolean'
+            if (hasTorch) setTorchSupported(true)
+
+            const getCap = track as unknown as {
+              getCapabilities?: () => { torch?: boolean }
+            }
+            const cap = getCap.getCapabilities
+              ? getCap.getCapabilities()
+              : undefined
+            if (cap && typeof cap.torch === 'boolean' && cap.torch) {
+              setTorchSupported(true)
+            }
+          }
+        }
+      } catch {
+        // noop - torch support detection is optional
+      }
+
+      setStatus('scanning')
+    } catch (err) {
+      startingRef.current = false
+      try {
+        if (controlsRef.current) {
+          controlsRef.current.stop()
+          controlsRef.current = null
+        }
+      } catch {
+        // noop
+      }
+
+      let friendly: string
+      if (err instanceof Error && err.message === 'video-element-timeout') {
+        friendly =
+          'Não foi possível inicializar a câmera. Recarregue a página e tente novamente.'
+      } else {
+        const msg =
+          err instanceof Error
+            ? err.message
+            : 'Não foi possível acessar a câmera.'
+        const lower = msg.toLowerCase()
+
+        friendly = msg
+        if (
+          lower.includes('permission') ||
+          lower.includes('denied') ||
+          lower.includes('not allowed') ||
+          lower.includes('permissão') ||
+          lower.includes('negada')
+        ) {
+          friendly =
+            'Permissão de câmera negada. Habilite a câmera nas configurações do navegador e recarregue a página.'
+        } else if (
+          lower.includes('notfound') ||
+          lower.includes('not found') ||
+          lower.includes('device') ||
+          lower.includes('no input') ||
+          lower.includes('não encontrado')
+        ) {
+          friendly =
+            'Nenhuma câmera foi encontrada no dispositivo. Verifique se há uma câmera conectada e habilitada.'
+        } else if (
+          lower.includes('notreadable') ||
+          lower.includes('track') ||
+          lower.includes('in use') ||
+          lower.includes('em uso')
+        ) {
+          friendly =
+            'Câmera está em uso por outro aplicativo. Feche outras janelas ou apps que possam estar usando a câmera e tente novamente.'
+        } else if (
+          lower.includes('overconstrained') ||
+          lower.includes('constraint')
+        ) {
+          friendly =
+            'Configurações da câmera não suportadas. Tente novamente em outro dispositivo.'
+        } else if (lower.includes('abort') || lower.includes('aborted')) {
+          friendly = 'Acesso à câmera foi interrompido. Tente novamente.'
+        }
+      }
+
+      setErrorMessage(friendly)
+      setStatus('error')
+    }
+  }
+
   const startScanner = async () => {
     if (disabled || status === 'starting' || status === 'scanning') return
+    if (startingRef.current) return
 
     const isSecure =
       typeof window !== 'undefined' &&
@@ -77,129 +233,12 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
     }
 
     setStatus('starting')
-    setErrorMessage('')
-
-    try {
-      const video = videoRef.current
-      if (!video) {
-        setErrorMessage('Elemento de vídeo não disponível.')
-        setStatus('error')
-        return
-      }
-
-      if (!readerRef.current) {
-        readerRef.current = new BrowserMultiFormatReader()
-      }
-
-      const controls = await readerRef.current.decodeFromVideoDevice(
-        undefined,
-        video,
-        (result, _err, ctrl) => {
-          const st = statusRef.current
-          if (st !== 'scanning' && st !== 'starting') return
-          if (result && result.getText()) {
-            const code = result.getText().trim()
-            if (code) {
-              try {
-                ctrl.stop()
-              } catch {
-                // noop
-              }
-              controlsRef.current = null
-              setTorchOn(false)
-              setTorchSupported(false)
-              setStatus('idle')
-              onCodeDetectedRef.current(code)
-            }
-          }
-        },
-      )
-
-      controlsRef.current = controls
-
-      try {
-        const stream = (video.srcObject as MediaStream | null)
-        if (stream) {
-          const tracks = stream.getVideoTracks()
-          if (tracks.length > 0) {
-            const track = tracks[0]
-            const settings = track.getSettings()
-            const hasTorch =
-              typeof (settings as unknown as { torch?: boolean }).torch ===
-              'boolean'
-            if (hasTorch) setTorchSupported(true)
-
-            const getCap = (track as unknown as { getCapabilities?: () => { torch?: boolean } })
-              .getCapabilities
-            const cap = getCap ? getCap() : undefined
-            if (cap && typeof cap.torch === 'boolean' && cap.torch) {
-              setTorchSupported(true)
-            }
-          }
-        }
-      } catch {
-        // noop - torch support detection is optional
-      }
-
-      setStatus('scanning')
-    } catch (err) {
-      try {
-        if (controlsRef.current) {
-          controlsRef.current.stop()
-          controlsRef.current = null
-        }
-      } catch {
-        // noop
-      }
-
-      const msg =
-        err instanceof Error ? err.message : 'Não foi possível acessar a câmera.'
-      const lower = msg.toLowerCase()
-
-      let friendly = msg
-      if (
-        lower.includes('permission') ||
-        lower.includes('denied') ||
-        lower.includes('not allowed') ||
-        lower.includes('permissão') ||
-        lower.includes('negada')
-      ) {
-        friendly =
-          'Permissão de câmera negada. Habilite a câmera nas configurações do navegador e recarregue a página.'
-      } else if (
-        lower.includes('notfound') ||
-        lower.includes('not found') ||
-        lower.includes('device') ||
-        lower.includes('no input') ||
-        lower.includes('não encontrado')
-      ) {
-        friendly =
-          'Nenhuma câmera foi encontrada no dispositivo. Verifique se há uma câmera conectada e habilitada.'
-      } else if (
-        lower.includes('notreadable') ||
-        lower.includes('track') ||
-        lower.includes('in use') ||
-        lower.includes('em uso')
-      ) {
-        friendly =
-          'Câmera está em uso por outro aplicativo. Feche outras janelas ou apps que possam estar usando a câmera e tente novamente.'
-      } else if (
-        lower.includes('overconstrained') ||
-        lower.includes('constraint')
-      ) {
-        friendly =
-          'Configurações da câmera não suportadas. Tente novamente em outro dispositivo.'
-      } else if (
-        lower.includes('abort') ||
-        lower.includes('aborted')
-      ) {
-        friendly = 'Acesso à câmera foi interrompido. Tente novamente.'
-      }
-
-      setErrorMessage(friendly)
-      setStatus('error')
-    }
   }
+
+  useEffect(() => {
+    if (status !== 'starting') return
+    void runScanner()
+  }, [status])
 
   const toggleTorch = async () => {
     const video = videoRef.current
@@ -226,6 +265,7 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
       } catch {
         // noop
       }
+      startingRef.current = false
     }
   }, [])
 
@@ -256,39 +296,45 @@ export function QrCodeScanner({ onCodeDetected, disabled }: QrCodeScannerProps) 
           isActive ? 'aspect-video' : 'aspect-[4/1] border-dashed'
         } border-zinc-200`}
       >
+        <video
+          ref={videoRef}
+          playsInline
+          autoPlay
+          muted
+          controls={false}
+          className={`h-full w-full object-cover ${
+            isActive ? 'block' : 'hidden'
+          }`}
+          webkit-playsinline="true"
+          x5-playsinline="true"
+        />
         {isActive ? (
-          <>
-            <video
-              ref={videoRef}
-              playsInline
-              muted
-              className="h-full w-full object-cover"
-            />
-            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="h-[55%] w-[65%] border-2 border-white/80 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]">
-                <div className="absolute -top-1 -left-1 h-5 w-5 border-t-4 border-l-4 border-emerald-400 rounded-tl-md" />
-                <div className="absolute -top-1 -right-1 h-5 w-5 border-t-4 border-r-4 border-emerald-400 rounded-tr-md" />
-                <div className="absolute -bottom-1 -left-1 h-5 w-5 border-b-4 border-l-4 border-emerald-400 rounded-bl-md" />
-                <div className="absolute -bottom-1 -right-1 h-5 w-5 border-b-4 border-r-4 border-emerald-400 rounded-br-md" />
-              </div>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="h-[55%] w-[65%] border-2 border-white/80 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]">
+              <div className="absolute -top-1 -left-1 h-5 w-5 border-t-4 border-l-4 border-emerald-400 rounded-tl-md" />
+              <div className="absolute -top-1 -right-1 h-5 w-5 border-t-4 border-r-4 border-emerald-400 rounded-tr-md" />
+              <div className="absolute -bottom-1 -left-1 h-5 w-5 border-b-4 border-l-4 border-emerald-400 rounded-bl-md" />
+              <div className="absolute -bottom-1 -right-1 h-5 w-5 border-b-4 border-r-4 border-emerald-400 rounded-br-md" />
             </div>
-            <div className="absolute top-2 left-2 inline-flex items-center gap-1.5 rounded-full bg-black/60 text-white text-[10px] font-medium px-2 py-1">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-              </span>
-              <span className="uppercase tracking-wider">
-                {status === 'starting' ? 'Iniciando...' : 'Ao vivo'}
-              </span>
-            </div>
-          </>
+          </div>
+        ) : null}
+        {isActive ? (
+          <div className="absolute top-2 left-2 inline-flex items-center gap-1.5 rounded-full bg-black/60 text-white text-[10px] font-medium px-2 py-1">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+            </span>
+            <span className="uppercase tracking-wider">
+              {status === 'starting' ? 'Iniciando...' : 'Ao vivo'}
+            </span>
+          </div>
         ) : status === 'error' ? (
-          <div className="flex h-full items-center justify-center gap-2 text-xs text-red-400 px-3 text-center">
+          <div className="absolute inset-0 flex h-full items-center justify-center gap-2 text-xs text-red-400 px-3 text-center">
             <CameraOff className="h-4 w-4 shrink-0" />
             <span>{errorMessage || 'Erro ao acessar câmera.'}</span>
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center gap-2 text-xs text-zinc-400">
+          <div className="absolute inset-0 flex h-full items-center justify-center gap-2 text-xs text-zinc-400">
             <QrCode className="h-4 w-4" />
             <span>Câmera desligada. Clique abaixo para escanear.</span>
           </div>
